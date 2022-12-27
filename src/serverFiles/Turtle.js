@@ -1,8 +1,10 @@
+/*
+* Holds data pertaining to a Turtle
+*/
+
 //Turtle code: https://patebin.com/6ZnajFGz
 
-//import { Item } from "./Item";
 const { Vector3 } = require("three");
-//import { WebSocket, WebSocketServer } from "ws";
 
 class Turtle {
     //Variables ===
@@ -33,61 +35,53 @@ class Turtle {
     //Move functions
     //Stats functions
     //Get Map data
-    turnRight() {
-        return this.execute("turtle.turnRight()").then(function(data) {
-            return data.callback;
-        });
+    async turnRight() {
+        const data = await this.execute("turtle.turnRight()");
+        return data.callback;
     }
 
-    turnLeft() {
-        return this.execute("turtle.turnLeft()").then(function(data) {
-            return data.callback;
-        });
+    async turnLeft() {
+        const data = await this.execute("turtle.turnLeft()");
+        return data.callback;
     }
 
-    moveForward() {
-        return this.execute("turtle.forward()").then(function(data) {
-            console.log(data);
-            return data.callback;
-        });
+    async moveForward() {
+        const data = await this.execute("turtle.forward()");
+        console.log(data);
+        return data.callback;
     }
 
-    moveBackward() {
-        return this.execute("turtle.back()").then(function(data) {
-            return data.callback;
-        });
+    async moveBackward() {
+        const data = await this.execute("turtle.back()");
+        return data.callback;
     }
 
-    moveDown() {
-        return this.execute("turtle.down()").then(function(data) {
-            return data.callback;
-        });
+    async moveDown() {
+        const data = await this.execute("turtle.down()");
+        return data.callback;
     }
 
-    moveUp() {
-        return this.execute("turtle.up()").then(function(data) {
-            return data.callback;
-        });
+    async moveUp() {
+        const data = await this.execute("turtle.up()");
+        return data.callback;
     }
 
-    digForward() {
-        return this.execute("turtle.dig()").then(function(data) {
-            return data.callback;
-        });
+    async digForward() {
+        const data = await this.execute("turtle.dig()");
+        return data.callback;
     }
 
-    digDown() {
-        return this.execute("turtle.digDown()").then(function(data) {
-            return data.callback;
-        });
+    async digDown() {
+        const data = await this.execute("turtle.digDown()");
+        return data.callback;
     }
 
-    digUp() {
-        return this.execute("turtle.digUp()").then(function(data) {
-            return data.callback;
-        });
+    async digUp() {
+        const data = await this.execute("turtle.digUp()");
+        return data.callback;
     }
 
+    //Send data to a Turtle and execute it, returning what the command executes within the turtle as a Promise
     async execute(value) {
         //Add any data necessary to this JSON object
         let data = {

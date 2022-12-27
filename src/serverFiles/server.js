@@ -1,8 +1,10 @@
+/*
+* Creates a WebSocketServer. Whenever a client connects it creates a new object with the corresponding data allowing for
+* the server to send data to each client.
+*/
+
 const { WebSocketServer } = require("ws");
 const Turtle = require("./Turtle.js");
-
-
-const prompt = require('prompt-sync')();
 
 //The port
 const port = 2553;
@@ -10,14 +12,15 @@ const port = 2553;
 //WebSocket server started on this machine on specified port
 const wss = new WebSocketServer({port});
 
-//When a websocket connects to the server...
+//When a websocket connects to the server create a new Turtle object passing in it's
+//Corresponding WebSocket
 wss.on('connection', async (ws) => {
     let turtle = new Turtle(ws);
+    
+    //Randomly call actions on a turtle for testing purposes
     while(true) {
-        //const move = prompt("move: ");
         let letters = ["w", "a", "s", "d", " ", "z", "x", "c", "v"];
-        let move = letters[0];
-        console.log(move);
+        let move = letters[Math.trunc(Math.random() * letters.length)];
         if(move == 'w') {
             await turtle.moveForward();
         } else if(move == 'a') {
@@ -37,11 +40,9 @@ wss.on('connection', async (ws) => {
         } else if(move == 'v') {
             await turtle.digUp();
         }
-
-        setTimeout(() => {  console.log("World!"); }, 2000);
     }
 });
 
-
+//Display the server is running
 console.log(`Listening at ${port}...`);
 

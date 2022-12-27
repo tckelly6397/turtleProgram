@@ -1,3 +1,7 @@
+/*
+* Creates the Three.js display and displays objects
+*/
+
 import * as THREE from '../build/three.module.js'
 import { OrbitControls } from '../build/OrbitControls.js'
 
@@ -9,16 +13,17 @@ document.getElementById('webglviewer').appendChild(renderer.domElement);
 
 var scene = new THREE.Scene();
 
-//Camera
+//Setup the camera
 var camera = new THREE.PerspectiveCamera(
-    75,
-    window.innerWidth / window.innerHeight,
-    1,
-    10000000
+    75, //FOV
+    window.innerWidth / window.innerHeight, //Ratio
+    1, //Minimum distance
+    10000000 //Maximum distance
 )
 camera.position.set(0, 0, 0);
 camera.lookAt(10, 0, 0);
 
+//Set the controls to orbital controls
 var controls = new OrbitControls(camera, renderer.domElement);
 controls.target.set(camera.position.x + .1, camera.position.y, camera.position.z);
 controls.panSpeed = 15;
@@ -32,15 +37,26 @@ var sphere = new THREE.Mesh(geometry, material);
 sphere.position.set(10, 0, 0);
 scene.add(sphere);
 
-for(let i = 0; i < 10; i++) {
+//Creates n cubes
+let n = 10;
+for(let i = 0; i < n; i++) {
+    //Create the geometry of a cube of size 5
     const geometryC = new THREE.BoxGeometry( 5, 5, 5 );
-    let color = new THREE.Color( 0xffffff );
-    color.setHex( Math.random() * 0xffffff );
+
+    //Create a basic random Color
+    let color = new THREE.Color( Math.random() * 0xffffff );
+    
+    //Create a material applying the color and an opacity, defining its transparent
     const materialC = new THREE.MeshBasicMaterial( {color: color } );
     materialC.transparent = true;
     materialC.opacity = 0.5;
+
+    //Create a mesh applying the geometry and material
     const cube = new THREE.Mesh( geometryC, materialC );
+    //Set the position of the mesh
     cube.position.set(-5 + -5 * i, 0, 0);
+
+    //Add the cube to the scene
     scene.add( cube );
 }
 

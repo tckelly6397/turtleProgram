@@ -1,3 +1,8 @@
+/*
+* Creates the Electron application and window
+*/
+
+//Server is used to seperate files to be more organized, still running the server file
 const server = require("./serverFiles/server");
 const { app, BrowserWindow } = require('electron');
 

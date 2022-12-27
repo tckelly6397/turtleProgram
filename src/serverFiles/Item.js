@@ -1,3 +1,7 @@
+/*
+* Holds data pertaining to Items
+*/
+
 class Item {
     label;
     count;
@@ -7,3 +11,5 @@ class Item {
         this.count = count;
     }
 }
+
+module.exports = Item;
