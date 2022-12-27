@@ -4,7 +4,8 @@
   "description": "cc interface",
   "main": "./src/main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "wsServer": "./src/serverFiles/server.js"
   },
   "repository": {
     "type": "git",
@@ -23,9 +24,13 @@
     "electron": "^22.0.0",
     "electron-reload": "^2.0.0-alpha.1",
     "path": "^0.12.7",
-    "three": "^0.148.0"
+    "prompt-sync": "^4.2.0",
+    "three": "^0.148.0",
+    "ws": "^8.11.0"
   },
   "build": {
-    "extraResources": ["./src/**"]
+    "extraResources": [
+      "./src/**"
+    ]
   }
 }

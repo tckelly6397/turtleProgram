@@ -32,7 +32,7 @@ var sphere = new THREE.Mesh(geometry, material);
 sphere.position.set(10, 0, 0);
 scene.add(sphere);
 
-for(let i = 0; i < 5; i++) {
+for(let i = 0; i < 10; i++) {
     const geometryC = new THREE.BoxGeometry( 5, 5, 5 );
     let color = new THREE.Color( 0xffffff );
     color.setHex( Math.random() * 0xffffff );

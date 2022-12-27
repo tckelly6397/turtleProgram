@@ -1,7 +1,5 @@
+const server = require("./serverFiles/server");
 const { app, BrowserWindow } = require('electron');
-const path = require('path');
-
-path.join(__dirname, './src/');
 
 function createWindow () {
   const win = new BrowserWindow({
