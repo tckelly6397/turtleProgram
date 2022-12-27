@@ -1,0 +1,31 @@
+{
+  "name": "ccproject",
+  "version": "1.0.0",
+  "description": "cc interface",
+  "main": "./src/main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tckelly6397/turtleProgram.git"
+  },
+  "keywords": [
+    "cc"
+  ],
+  "author": "Thomas Kelly",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tckelly6397/turtleProgram/issues"
+  },
+  "homepage": "https://github.com/tckelly6397/turtleProgram#readme",
+  "dependencies": {
+    "electron": "^22.0.0",
+    "electron-reload": "^2.0.0-alpha.1",
+    "path": "^0.12.7",
+    "three": "^0.148.0"
+  },
+  "build": {
+    "extraResources": ["./src/**"]
+  }
+}
