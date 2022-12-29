@@ -6,7 +6,7 @@ contextBridge.exposeInMainWorld(
     "api", {
         send: (channel, data) => {
             // whitelist channels
-            let validChannels = ["getMap"];
+            let validChannels = ["getMap", "move"];
             if (validChannels.includes(channel)) {
                 ipcRenderer.send(channel, data);
             }
@@ -14,7 +14,7 @@ contextBridge.exposeInMainWorld(
         receive: (channel, func) => {
             let validChannels = ["updatedMap"];
             if (validChannels.includes(channel)) {
-                // Deliberately strip event as it includes `sender` 
+                // Deliberately strip event as it includes `sender`
                 ipcRenderer.on(channel, (event, ...args) => func(...args));
             }
         }

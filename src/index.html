@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <script type="module" src="./threeRenderer.js"></script>
+
         <style>
             body {
                 margin: 0;
@@ -19,7 +21,11 @@
     </head>
     <body>
         <div id="webglviewer" class="full-screen"></div>
-
-        <script type="module" src="./threeRenderer.js"></script>
+        <Button style="position: relative" id="forwardBtn">Move forward</Button>
+        <Button style="position: relative" id="rightBtn">Turn Right</Button>
+        <Button style="position: relative" id="leftBtn">Turn Left</Button>
+        <Button style="position: relative" id="upBtn">Move Up</Button>
+        <Button style="position: relative" id="downBtn">Move Down</Button>
+        <Button style="position: relative" id="backBtn">Move Back</Button>
     </body>
 </html>

@@ -46,14 +46,33 @@ app.on('window-all-closed', () => {
   }
 })
 
+//When called send back the turtles position
 ipcMain.on("getMap", (event, args) => {
-  //console.log(args);
-  console.log(server);
+
+  //If there is a turtle then continue
   if(server.turtles[0] != undefined) {
       let position = server.turtles[0].getPositionAsJSON();
-      console.log("test: " + JSON.parse(position));
       if(position != undefined && win != 'undefined') {
+
+        //Send the data
           win.webContents.send("updatedMap", position);
       }
   }
+});
+
+ipcMain.on("move", (event, args) => {
+  if(args == "forward") {
+    server.turtles[0].moveForward();
+  } else if(args == "turnRight") {
+    server.turtles[0].turnRight();
+  } else if(args == "turnLeft") {
+    server.turtles[0].turnLeft();
+  } else if(args == "up") {
+    server.turtles[0].moveUp();
+  } else if(args == "down") {
+    server.turtles[0].moveDown();
+  } else if(args == "back") {
+    server.turtles[0].moveBackward();
+  }
+
 });

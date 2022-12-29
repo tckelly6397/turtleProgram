@@ -35,7 +35,7 @@ controls.panSpeed = 15;
 
 //Sphere
 var geometry = new THREE.SphereBufferGeometry(3, 32, 32);
-var material = new THREE.MeshBasicMaterial({ 
+var material = new THREE.MeshBasicMaterial({
     color: 0x00ff00 
 });
 var sphere = new THREE.Mesh(geometry, material);
@@ -50,7 +50,7 @@ for(let i = 0; i < n; i++) {
 
     //Create a basic random Color
     let color = new THREE.Color( Math.random() * 0xffffff );
-    
+
     //Create a material applying the color and an opacity, defining its transparent
     const materialC = new THREE.MeshBasicMaterial( {color: color } );
     materialC.transparent = true;
@@ -79,16 +79,6 @@ cubeT.position.set(15, 5, 0);
 //Add the cube to the scene
 scene.add( cubeT );
 
-
-// Called when message received from main process
-window.api.receive("updatedMap", (data) => {
-    //Parse the JSON String
-    data = JSON.parse(data);
-
-    //Update the position
-    cubeT.position.set(data[0] * 5, data[1] * 5, data[2] * 5);
-});
-
 // Call the animate function
 animate();
 
@@ -108,4 +98,53 @@ function animate() {
 
     // Render the scene
     renderer.render(scene, camera);
+}
+
+//////////////////////
+//Turtle stuff
+//////////////////////
+
+// Called when message received from main process
+window.api.receive("updatedMap", (data) => {
+    //Parse the JSON String
+    data = JSON.parse(data);
+
+    //Update the position
+    cubeT.position.set(data[0] * 5, data[1] * 5, data[2] * 5);
+});
+
+document.getElementById("forwardBtn").onclick = function(){
+    // Send a message to the main process
+    console.log("moving");
+    window.api.send("move", "forward");
+}
+
+document.getElementById("backBtn").onclick = function(){
+    // Send a message to the main process
+    console.log("moving");
+    window.api.send("move", "back");
+}
+
+document.getElementById("rightBtn").onclick = function(){
+    // Send a message to the main process
+    console.log("moving");
+    window.api.send("move", "turnRight");
+}
+
+document.getElementById("leftBtn").onclick = function(){
+    // Send a message to the main process
+    console.log("moving");
+    window.api.send("move", "turnLeft");
+}
+
+document.getElementById("upBtn").onclick = function(){
+    // Send a message to the main process
+    console.log("moving");
+    window.api.send("move", "up");
+}
+
+document.getElementById("downBtn").onclick = function(){
+    // Send a message to the main process
+    console.log("moving");
+    window.api.send("move", "down");
 }

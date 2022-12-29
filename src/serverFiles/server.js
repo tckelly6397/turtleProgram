@@ -23,6 +23,7 @@ wss.on('connection', async (ws) => {
     turtles.push(turtle);
 
     //Randomly call actions on a turtle for testing purposes
+    /*
     while(true) {
         let letters = ["w", "a", "s", "d", " ", "z", "x", "c", "v"];
         let move = letters[Math.trunc(Math.random() * letters.length)];
@@ -45,9 +46,9 @@ wss.on('connection', async (ws) => {
         } else if(move == 'v') {
             await turtle.digUp();
         }
-
         console.log(turtle.position);
     }
+    */
 });
 
 //Display the server is running

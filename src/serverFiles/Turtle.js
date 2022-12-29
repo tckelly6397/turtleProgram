@@ -126,11 +126,11 @@ class Turtle {
             this.ws.on('message', (message) => {
                 resolve(JSON.parse(message));
             });
-        }); 
+        });
     }
 
     getStats() {
-        return "{" + this.label + ", " + this.inventory + 
+        return "{" + this.label + ", " + this.inventory +
         ", position{" + this.position.x + ", " + this.position.y + ", " + this.position.z + "}" +
         ", " + this.rotation + ", " + this.fuel + "}";
     }
