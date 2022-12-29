@@ -37,32 +37,62 @@ class Turtle {
     //Get Map data
     async turnRight() {
         const data = await this.execute("turtle.turnRight()");
+
+        if(data.callback === true) {
+            this.rotation += 90;
+        }
+
         return data.callback;
     }
 
     async turnLeft() {
         const data = await this.execute("turtle.turnLeft()");
+
+        if(data.callback === true) {
+            this.rotation -= 90;
+        }
+
         return data.callback;
     }
 
     async moveForward() {
         const data = await this.execute("turtle.forward()");
         console.log(data);
+
+        if(data.callback === true) {
+            this.position.add(new Vector3(Math.round(Math.cos(this.rotation * (Math.PI/180))), 0, Math.round(Math.sin(this.rotation * (Math.PI/180)))));
+        }
+
         return data.callback;
     }
 
     async moveBackward() {
         const data = await this.execute("turtle.back()");
+
+        if(data.callback === true) {
+            this.position.add(new Vector3(Math.round(-Math.cos(this.rotation * (Math.PI/180))), 0, Math.round(-Math.sin(this.rotation * (Math.PI/180)))));
+        }
+
         return data.callback;
     }
 
     async moveDown() {
         const data = await this.execute("turtle.down()");
+
+        if(data.callback === true) {
+            this.position.add(new Vector3(0, -1, 0));
+        }
+
         return data.callback;
     }
 
     async moveUp() {
         const data = await this.execute("turtle.up()");
+
+        if(data.callback === true) {
+            this.position.add(new Vector3(0, 1, 0));
+        }
+
         return data.callback;
     }
 
@@ -103,6 +133,16 @@ class Turtle {
         return "{" + this.label + ", " + this.inventory + 
         ", position{" + this.position.x + ", " + this.position.y + ", " + this.position.z + "}" +
         ", " + this.rotation + ", " + this.fuel + "}";
+    }
+
+    getPositionAsJSON() {
+        let coords = [
+            this.position.x,
+            this.position.y,
+            this.position.z
+        ]
+
+        return JSON.stringify(coords);
     }
 }
 

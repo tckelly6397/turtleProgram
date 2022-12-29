@@ -5,6 +5,11 @@
 import * as THREE from '../build/three.module.js'
 import { OrbitControls } from '../build/OrbitControls.js'
 
+/*
+const THREE = require('../build/three.module.js');
+const OrbitControls = require('../build/OrbitControls.js');
+*/
+
 var renderer = new THREE.WebGLRenderer();
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -60,6 +65,30 @@ for(let i = 0; i < n; i++) {
     scene.add( cube );
 }
 
+//Create the geometry of a cube of size 5
+const geometryT = new THREE.BoxGeometry( 5, 5, 5 );
+
+//Create a material applying the color and an opacity, defining its transparent
+const materialT = new THREE.MeshBasicMaterial( {color: 0xf1332d } );
+
+//Create a mesh applying the geometry and material
+let cubeT = new THREE.Mesh( geometryT, materialT );
+//Set the position of the mesh
+cubeT.position.set(15, 5, 0);
+
+//Add the cube to the scene
+scene.add( cubeT );
+
+
+// Called when message received from main process
+window.api.receive("updatedMap", (data) => {
+    //Parse the JSON String
+    data = JSON.parse(data);
+
+    //Update the position
+    cubeT.position.set(data[0] * 5, data[1] * 5, data[2] * 5);
+});
+
 // Call the animate function
 animate();
 
@@ -70,10 +99,13 @@ function animate() {
     // The window.requestAnimationFrame() method tells the browser that you wish to perform an animation and requests that the browser calls a specified function to update an animation before the next repaint. (docs)
     requestAnimationFrame(animate);
 
+    // Send a message to the main process
+    window.api.send("getMap", "some data");
+
     // Update the controls
     controls.update();
+    cubeT.updateMatrix();
 
     // Render the scene
     renderer.render(scene, camera);
-
 }
