@@ -157,10 +157,20 @@ class Turtle {
         return data;
     }
 
+    waitFor(conditionFunction) {
+
+        const poll = resolve => {
+          if(conditionFunction()) resolve();
+          else setTimeout(_ => poll(resolve), 10);
+        }
+
+        return new Promise(poll);
+    }
+
     //Send data to a Turtle and execute it, returning what the command executes within the turtle as a Promise
     async execute(value) {
+        await this.waitFor(_ => this.busy === false);
         this.busy = true;
-
         //Add any data necessary to this JSON object
         let data = {
             "command": "return " + value
@@ -194,10 +204,7 @@ class Turtle {
         return JSON.stringify(coords);
     }
 
-    isBusy() {
-        return this.busy;
-    }
-
+    //Returns a list of blocks based on the detection of the turtle
     async detect() {
         let blocks = [];
         let top = await this.detectUp();
