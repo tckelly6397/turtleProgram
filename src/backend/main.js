@@ -7,6 +7,7 @@ const server = require("./serverFiles/server.js");
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require("path");
 const fs = require('fs');
+const { Vector3 } = require("three");
 
 var win;
 
@@ -81,8 +82,21 @@ ipcMain.on("move", (event, args) => {
   }
 });
 
-//When called send back the turtles position
+//When called return world data
 ipcMain.on("getWorld", (event, args) => {
-  console.log(__dirname + './worlds/exampleWorld.json');
-  win.webContents.send("world", JSON.parse(fs.readFileSync('./src/backend/worlds/exampleWorld.json')));
+  fs.readFile('./src/backend/worlds/exampleWorld.json', (err, data)=>{
+    let jsonData = JSON.parse(data);
+    let jsonTurtle = jsonData.turtle;
+    server.turtles[0].position = new Vector3(jsonTurtle.x, jsonTurtle.y, jsonTurtle.z);
+    win.webContents.send("world", jsonData);
+  });
+});
+
+//When called return detected blocks
+ipcMain.on("detect", (event, args) => {
+  let jsonData = server.turtles[0].detect();
+  jsonData.then((data) => {
+    console.log("ahhh" + data);
+    win.webContents.send("detected", data);
+  });
 });

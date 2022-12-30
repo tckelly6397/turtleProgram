@@ -142,6 +142,21 @@ class Turtle {
         return data.callback;
     }
 
+    async detectUp() {
+        const data = await this.execute("turtle.inspectUp()");
+        return data;
+    }
+
+    async detectForward() {
+        const data = await this.execute("turtle.inspect()");
+        return data;
+    }
+
+    async detectDown() {
+        const data = await this.execute("turtle.inspectDown()");
+        return data;
+    }
+
     //Send data to a Turtle and execute it, returning what the command executes within the turtle as a Promise
     async execute(value) {
         this.busy = true;
@@ -181,6 +196,42 @@ class Turtle {
 
     isBusy() {
         return this.busy;
+    }
+
+    async detect() {
+        let blocks = [];
+        let top = await this.detectUp();
+        let down = await this.detectDown();
+        let forward = await this.detectForward();
+
+        let blockU = {
+            "name": (top.callback) ? top.extra.name : "air",
+            "x": this.position.x,
+            "y": this.position.y + 1,
+            "z": this.position.z
+        }
+
+        let blockD = {
+            "name": (down.callback) ? down.extra.name : "air",
+            "x": this.position.x,
+            "y": this.position.y - 1,
+            "z": this.position.z
+        }
+
+        let blockF = {
+            "name": (forward.callback) ? forward.extra.name : "air",
+            "x": this.position.x + Math.round(Math.cos(this.rotation * (Math.PI/180))),
+            "y": this.position.y,
+            "z": this.position.z + Math.round(Math.sin(this.rotation * (Math.PI/180)))
+        }
+
+        blocks.push(blockU);
+        blocks.push(blockD);
+        blocks.push(blockF);
+
+        console.log("ttt" + blocks);
+
+        return JSON.stringify(blocks);
     }
 }
 
