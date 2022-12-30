@@ -89,6 +89,7 @@ function addBlock(block) {
                 scene.remove(value);
                 break;
             }
+            return;
         }
     }
 
@@ -203,6 +204,14 @@ for (var i = 0; i < InteractionChildren.length; i++) {
             window.api.send("getWorld", command);
         } else if(command == "detect") {
             window.api.send("detect", command);
+        } else if(command == "updateWorld") {
+            let worldData = [];
+            for (let [key, value] of objectMap) {
+                console.log(key);
+                worldData.push(key);
+            }
+
+            window.api.send("updateWorld", worldData);
         } else {
             window.api.send("move", command);
         }

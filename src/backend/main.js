@@ -100,3 +100,35 @@ ipcMain.on("detect", (event, args) => {
     win.webContents.send("detected", data);
   });
 });
+
+//Update world
+ipcMain.on("updateWorld", (event, args) => {
+  fs.readFile('./src/backend/worlds/exampleWorld.json', (err, data)=>{
+    /*
+    let jsonTurtle = jsonData.turtle;
+    jsonTurtle.x = server.turtles[0].position.x;
+    jsonTurtle.y = server.turtles[0].position.y;
+    jsonTurtle.z = server.turtles[0].position.z;
+    console.log(jsonTurtle + " " + server.turtles[0].position);
+
+    jsonData.turtle = jsonTurtle;
+    jsonData.WorldData.blocks = args;
+    */
+
+    let worldD = {
+      "turtle": {
+        "label": server.turtles[0].label,
+        "computerId": server.turtles[0].computerId,
+        "fuel": server.turtles[0].fuel,
+        "x": server.turtles[0].position.x,
+        "y": server.turtles[0].position.y,
+        "z": server.turtles[0].position.z
+      },
+      "WorldData": {
+        "blocks": args
+      }
+    }
+
+    fs.writeFile('./src/backend/worlds/exampleWorld.json', JSON.stringify(worldD), err => {});
+  });
+});
