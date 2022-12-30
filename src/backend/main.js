@@ -88,38 +88,37 @@ ipcMain.on("getWorld", (event, args) => {
     let jsonData = JSON.parse(data);
     let jsonTurtle = jsonData.turtle;
     server.turtles[0].position = new Vector3(jsonTurtle.x, jsonTurtle.y, jsonTurtle.z);
+    server.turtles[0].rotation = jsonTurtle.rotation;
     win.webContents.send("world", jsonData);
   });
 });
 
 //When called return detected blocks
 ipcMain.on("detect", (event, args) => {
-  let jsonData = server.turtles[0].detect();
-  jsonData.then((data) => {
-    console.log("ahhh" + data);
-    win.webContents.send("detected", data);
-  });
+  detectAll();
 });
+
+function detectAll() {
+  if(server.turtles[0].isBusy() === false) {
+    let jsonData = server.turtles[0].detect();
+    jsonData.then((data) => {
+      win.webContents.send("detected", data);
+    });
+  } else {
+    setTimeout(detectAll, 10);
+  }
+}
 
 //Update world
 ipcMain.on("updateWorld", (event, args) => {
   fs.readFile('./src/backend/worlds/exampleWorld.json', (err, data)=>{
-    /*
-    let jsonTurtle = jsonData.turtle;
-    jsonTurtle.x = server.turtles[0].position.x;
-    jsonTurtle.y = server.turtles[0].position.y;
-    jsonTurtle.z = server.turtles[0].position.z;
-    console.log(jsonTurtle + " " + server.turtles[0].position);
-
-    jsonData.turtle = jsonTurtle;
-    jsonData.WorldData.blocks = args;
-    */
 
     let worldD = {
       "turtle": {
         "label": server.turtles[0].label,
         "computerId": server.turtles[0].computerId,
         "fuel": server.turtles[0].fuel,
+        "rotation": server.turtles[0].rotation,
         "x": server.turtles[0].position.x,
         "y": server.turtles[0].position.y,
         "z": server.turtles[0].position.z

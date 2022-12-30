@@ -217,3 +217,27 @@ for (var i = 0; i < InteractionChildren.length; i++) {
         }
     }
 }
+
+document.addEventListener('keydown', function(event) {
+    if(event.key == 'w') {
+        window.api.send("move", "forward");
+        window.api.send("detect", "");
+    } else if(event.key == 'a') {
+        window.api.send("move", "turnLeft");
+        window.api.send("detect", "");
+    } else if(event.key == 'd') {
+        window.api.send("move", "turnRight");
+        window.api.send("detect", "");
+    } else if(event.key == 's') {
+        window.api.send("move", "back");
+        window.api.send("detect", "");
+    } else if(event.key == ' ') {
+        window.api.send("move", "up");
+        window.api.send("detect", "");
+    } else if(event.shiftKey) {
+        window.api.send("move", "down");
+        window.api.send("detect", "");
+    } else if(event.key == 'f') {
+        window.api.send("detect", "");
+    }
+});

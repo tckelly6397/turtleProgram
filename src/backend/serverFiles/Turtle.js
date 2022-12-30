@@ -229,8 +229,6 @@ class Turtle {
         blocks.push(blockD);
         blocks.push(blockF);
 
-        console.log("ttt" + blocks);
-
         return JSON.stringify(blocks);
     }
 }
