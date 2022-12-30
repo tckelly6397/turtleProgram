@@ -14,7 +14,7 @@ document.getElementById('webglviewer').appendChild(renderer.domElement);
 export var scene = new THREE.Scene();
 
 //Setup the camera
-var camera = new THREE.PerspectiveCamera(
+export var camera = new THREE.PerspectiveCamera(
     75, //FOV
     window.innerWidth / window.innerHeight, //Ratio
     1, //Minimum distance
@@ -26,7 +26,7 @@ camera.lookAt(10, 0, 0);
 //Set the controls to orbital controls
 export var controls = new OrbitControls(camera, renderer.domElement);
 controls.target.set(camera.position.x + .1, camera.position.y, camera.position.z);
-controls.panSpeed = 3;
+controls.panSpeed = 2;
 controls.rotateSpeed = 1;
 controls.enableDamping = true;
 controls.dampingFactor = 0.2;

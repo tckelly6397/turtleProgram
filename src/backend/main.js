@@ -1,17 +1,21 @@
 /*
 * Creates the Electron application and window
 */
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, dialog } = require('electron');
 const path = require("path");
 const turtleApi = require("./turtleApi");
 
 var win;
 
+function delay(time) {
+  return new Promise(resolve => setTimeout(resolve, time));
+}
+
 function createWindow () {
   win = new BrowserWindow({
     useContentSize: true,
-    width: 800,
-    height: 600,
+    width: 1000,
+    height: 700,
 
     // The lines below solved the issue
     webPreferences: {
@@ -26,6 +30,31 @@ function createWindow () {
 
   //Set the turtleApis win
   turtleApi.updateWin(win);
+
+  //On close ask to save
+  win.on('close', e => {
+    e.preventDefault()
+    dialog.showMessageBox({
+      type: 'question',
+      buttons: ['Cancel', 'Yes', 'No'],
+      cancelId: 2,
+      defaultId: 0,
+      title: 'Save before quitting?',
+      detail: 'Save world before exiting?'
+    }).then(async ({ response, checkboxChecked }) => {
+      console.log(`response: ${response}`)
+      if (response == 2) {
+        win.destroy()
+        app.quit()
+      } else if (response == 1) {
+        win.webContents.send("retrieveAndUpdateWorldData");
+
+        await delay(500);
+        win.destroy();
+        app.quit();
+      }
+    })
+  })
 }
 
 app.whenReady().then(() => {

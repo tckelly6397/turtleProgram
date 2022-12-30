@@ -21,3 +21,8 @@
     cursor: pointer;
     background-color: #4D8F5f;
 }
+
+#info-area {
+    position: relative;
+    color: white;
+}

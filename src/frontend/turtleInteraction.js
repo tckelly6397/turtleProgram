@@ -1,4 +1,4 @@
-import { scene, cubeT, controls } from './threeRenderer.js'
+import { scene, cubeT, controls, camera } from './threeRenderer.js'
 import * as THREE from '../../build/three.module.js'
 
 let world;
@@ -99,7 +99,13 @@ window.api.receive("updateTurtlePosition", (data) => {
 
     //Update the position
     cubeT.position.set(data[0] * 5, data[1] * 5, data[2] * 5);
-    controls.target = cubeT.position;
+
+    //Allow panning of object without moving the object
+    scene.updateMatrixWorld(true);
+    var position = new THREE.Vector3();
+    position.setFromMatrixPosition( cubeT.matrixWorld );
+
+    controls.target = position;
 });
 
 //Get the world data
@@ -122,6 +128,16 @@ window.api.receive("detected", (data) => {
             addBlock(block);
         }
     }
+});
+
+window.api.receive("retrieveAndUpdateWorldData", (data) => {
+    let worldData = [];
+    for (let [key, value] of objectMap) {
+        console.log(key);
+        worldData.push(key);
+    }
+
+    window.api.send("updateWorld", worldData);
 });
 
 
@@ -165,5 +181,54 @@ document.addEventListener('keydown', function(event) {
         window.api.send("move", "down");
     } else if(event.key == 'f') {
         window.api.send("detect", "");
+    }
+});
+
+function getIntersection() {
+    var mouse = new THREE.Vector2();
+    mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+    mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
+    var raycaster = new THREE.Raycaster();
+    raycaster.setFromCamera(mouse, camera);
+
+    // calculate objects intersecting the picking ray
+    var intersects = raycaster.intersectObjects(scene.children);
+
+    if (intersects.length > 0) {
+      return intersects[0].object;
+    } else {
+        return undefined;
+    }
+}
+
+addEventListener('mousemove', (event) => {
+    let object = getIntersection(event);
+
+    if(object != undefined) {
+        document.body.style.cursor = 'pointer';
+        //object.material.color.set();
+    } else {
+        document.body.style.cursor = 'default';
+    }
+});
+
+addEventListener('mousedown', (event) => {
+    let object = getIntersection(event);
+
+    if(object != undefined) {
+        const inverse = new Map();
+        objectMap.forEach((value, key) => inverse.set(value, key));
+
+        let block = inverse.get(object);
+        if(block != undefined) {
+            document.getElementById("info-area").innerText = block.name;
+        }
+
+        scene.updateMatrixWorld(true);
+        var position = new THREE.Vector3();
+        position.setFromMatrixPosition( object.matrixWorld );
+
+        controls.target = position;
     }
 });
