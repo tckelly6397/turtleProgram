@@ -3,9 +3,10 @@
 */
 
 //Server is used to seperate files to be more organized, still running the server file
-const server = require("./serverFiles/server");
+const server = require("./serverFiles/server.js");
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require("path");
+const fs = require('fs');
 
 var win;
 
@@ -24,7 +25,7 @@ function createWindow () {
     },
   })
 
-  win.loadFile('./src/index.html')
+  win.loadFile(`./src/frontend/index.html`);
 
   // main process
   win.webContents.send('store-data', "data");
@@ -55,12 +56,13 @@ ipcMain.on("getMap", (event, args) => {
       if(position != undefined && win != 'undefined') {
 
         //Send the data
-          win.webContents.send("updatedMap", position);
+        win.webContents.send("updatedMap", position);
       }
   }
 });
 
 ipcMain.on("move", (event, args) => {
+  if(server.turtles[0].isBusy() === false) {
   if(args == "forward") {
     server.turtles[0].moveForward();
   } else if(args == "turnRight") {
@@ -73,6 +75,14 @@ ipcMain.on("move", (event, args) => {
     server.turtles[0].moveDown();
   } else if(args == "back") {
     server.turtles[0].moveBackward();
+  } else if(args == "stats") {
+    console.log(server.turtles[0].getStats());
   }
+  }
+});
 
+//When called send back the turtles position
+ipcMain.on("getWorld", (event, args) => {
+  console.log(__dirname + './worlds/exampleWorld.json');
+  win.webContents.send("world", JSON.parse(fs.readFileSync('./src/backend/worlds/exampleWorld.json')));
 });

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script type="module" src="./threeRenderer.js"></script>
+        <link rel="stylesheet" href="style.css">
+
+        <style>
+            body {
+                margin: 0;
+                overflow: hidden;
+            }
+
+            .full-screen {
+                position: absolute;
+                left: 0;
+                right: 0;
+                top: 0;
+                bottom: 0;
+                background-color: black;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="webglviewer" class="full-screen"></div>
+        <div id="interaction-buttons">
+            <Button  data-command="forward">Move forward</Button>
+            <Button data-command="turnRight">Turn Right</Button>
+            <Button data-command="turnLeft">Turn Left</Button>
+            <Button data-command="up">Move Up</Button>
+            <Button data-command="down">Move Down</Button>
+            <Button data-command="back">Move Back</Button>
+            <Button data-command="stats">Get Stats</Button>
+            <Button data-command="getWorld">Get World</Button>
+        </div>
+
+        <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+        <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    </body>
+</html>

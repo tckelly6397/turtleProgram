@@ -20,14 +20,25 @@ class Turtle {
     rotation;
     fuel;
     ws;
+    busy;
+    computerId;
 
     constructor(ws) {
-        this.label = "";
         this.inventory = [];
         this.position = new Vector3();
         this.rotation = 0;
-        this.fuel = 0;
         this.ws = ws;
+        this.busy = false;
+
+        this.getLabel().then(value => {
+                this.label = value;
+                this.getFuel().then(value => {
+                    this.fuel = value;
+                    this.getComputerId().then(value => {
+                        this.computerId = value;
+                    });
+                });
+            });
     }
 
     //Functions ===
@@ -111,8 +122,30 @@ class Turtle {
         return data.callback;
     }
 
+    async getLabel() {
+        const data = await this.execute("os.getComputerLabel()");
+        return data.callback;
+    }
+
+    async getLabel() {
+        const data = await this.execute("os.getComputerLabel()");
+        return data.callback;
+    }
+
+    async getFuel() {
+        const data = await this.execute("turtle.getFuelLevel()");
+        return data.callback;
+    }
+
+    async getComputerId() {
+        const data = await this.execute("os.getComputerID()");
+        return data.callback;
+    }
+
     //Send data to a Turtle and execute it, returning what the command executes within the turtle as a Promise
     async execute(value) {
+        this.busy = true;
+
         //Add any data necessary to this JSON object
         let data = {
             "command": "return " + value
@@ -124,13 +157,14 @@ class Turtle {
         //Return a promise and wait for a response
         return new Promise((resolve, reject) => {
             this.ws.on('message', (message) => {
+                this.busy = false;
                 resolve(JSON.parse(message));
             });
         });
     }
 
     getStats() {
-        return "{" + this.label + ", " + this.inventory +
+        return "{" + this.label + ", " + this.computerId + ", " + this.inventory +
         ", position{" + this.position.x + ", " + this.position.y + ", " + this.position.z + "}" +
         ", " + this.rotation + ", " + this.fuel + "}";
     }
@@ -143,6 +177,10 @@ class Turtle {
         ]
 
         return JSON.stringify(coords);
+    }
+
+    isBusy() {
+        return this.busy;
     }
 }
 

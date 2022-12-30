@@ -2,8 +2,8 @@
 * Creates the Three.js display and displays objects
 */
 
-import * as THREE from '../build/three.module.js'
-import { OrbitControls } from '../build/OrbitControls.js'
+import * as THREE from '../../build/three.module.js'
+import { OrbitControls } from '../../build/OrbitControls.js'
 
 /*
 const THREE = require('../build/three.module.js');
@@ -31,16 +31,10 @@ camera.lookAt(10, 0, 0);
 //Set the controls to orbital controls
 var controls = new OrbitControls(camera, renderer.domElement);
 controls.target.set(camera.position.x + .1, camera.position.y, camera.position.z);
-controls.panSpeed = 15;
-
-//Sphere
-var geometry = new THREE.SphereBufferGeometry(3, 32, 32);
-var material = new THREE.MeshBasicMaterial({
-    color: 0x00ff00 
-});
-var sphere = new THREE.Mesh(geometry, material);
-sphere.position.set(10, 0, 0);
-scene.add(sphere);
+controls.panSpeed = 3;
+controls.rotateSpeed = 1;
+controls.enableDamping = true;
+controls.dampingFactor = 0.2;
 
 //Creates n cubes
 let n = 10;
@@ -67,15 +61,12 @@ for(let i = 0; i < n; i++) {
 
 //Create the geometry of a cube of size 5
 const geometryT = new THREE.BoxGeometry( 5, 5, 5 );
-
 //Create a material applying the color and an opacity, defining its transparent
 const materialT = new THREE.MeshBasicMaterial( {color: 0xf1332d } );
-
 //Create a mesh applying the geometry and material
 let cubeT = new THREE.Mesh( geometryT, materialT );
 //Set the position of the mesh
 cubeT.position.set(15, 5, 0);
-
 //Add the cube to the scene
 scene.add( cubeT );
 
@@ -111,40 +102,23 @@ window.api.receive("updatedMap", (data) => {
 
     //Update the position
     cubeT.position.set(data[0] * 5, data[1] * 5, data[2] * 5);
+    controls.target = cubeT.position;
 });
 
-document.getElementById("forwardBtn").onclick = function(){
-    // Send a message to the main process
-    console.log("moving");
-    window.api.send("move", "forward");
-}
+window.api.receive("world", (data) => {
+    console.log(data);
+});
 
-document.getElementById("backBtn").onclick = function(){
-    // Send a message to the main process
-    console.log("moving");
-    window.api.send("move", "back");
-}
+var InteractionChildren = document.getElementById('interaction-buttons').children;
 
-document.getElementById("rightBtn").onclick = function(){
-    // Send a message to the main process
-    console.log("moving");
-    window.api.send("move", "turnRight");
-}
+for (var i = 0; i < InteractionChildren.length; i++) { // iterate over it
+    InteractionChildren[i].onclick = function () {   // attach event listener individually
+        let command = this.getAttribute("data-command");
 
-document.getElementById("leftBtn").onclick = function(){
-    // Send a message to the main process
-    console.log("moving");
-    window.api.send("move", "turnLeft");
-}
-
-document.getElementById("upBtn").onclick = function(){
-    // Send a message to the main process
-    console.log("moving");
-    window.api.send("move", "up");
-}
-
-document.getElementById("downBtn").onclick = function(){
-    // Send a message to the main process
-    console.log("moving");
-    window.api.send("move", "down");
+        if(command == "getWorld") {
+            window.api.send("getWorld", command);
+        } else {
+            window.api.send("move", command);
+        }
+    }
 }

@@ -5,8 +5,6 @@
 
 const { WebSocketServer } = require("ws");
 const Turtle = require("./Turtle.js");
-const { ipcMain } = require('electron');
-const main = require("../main.js");
 
 //The port
 const port = 2553;

@@ -2,10 +2,10 @@
   "name": "ccproject",
   "version": "1.0.0",
   "description": "cc interface",
-  "main": "./src/main.js",
+  "main": "./src/backend/main.js",
   "scripts": {
     "start": "electron .",
-    "wsServer": "./src/serverFiles/server.js"
+    "wsServer": "./src/backend/serverFiles/server.js"
   },
   "repository": {
     "type": "git",
@@ -25,6 +25,7 @@
     "electron-reload": "^2.0.0-alpha.1",
     "path": "^0.12.7",
     "prompt-sync": "^4.2.0",
+    "react": "^18.2.0",
     "three": "^0.148.0",
     "ws": "^8.11.0"
   },
