@@ -1,7 +1,6 @@
 import { scene, cubeT, controls, camera } from './threeRenderer.js'
 import * as THREE from '../../build/three.module.js'
 
-let world;
 let objects = [];
 const colorMap = new Map();
 let objectMap = new Map();
@@ -83,10 +82,21 @@ function addObject(block) {
     scene.add( cube );
 }
 
+function updateTurtle(data) {
+    cubeT.position.set(data.x * 5, data.y * 5, data.z * 5);
+
+    //Allow panning of object without moving the object
+    scene.updateMatrixWorld(true);
+    var positionNew = new THREE.Vector3();
+    positionNew.setFromMatrixPosition( cubeT.matrixWorld );
+    controls.target = positionNew;
+    rotate(data.rotation);
+}
+
 //Get the world and update it
 //Parameter is the turtle
 function updateWorld(turtle, initialWorld) {
-    cubeT.position.set(turtle.x * 5, turtle.y * 5, turtle.z * 5);
+    updateTurtle(turtle);
 
     objects = [];
 
@@ -98,29 +108,13 @@ function updateWorld(turtle, initialWorld) {
 }
 
 // Called when message received from main process
-window.api.receive("updateTurtlePosition", (data) => {
-    //Parse the JSON String
+window.api.receive("updateTurtleData", (data) => {
     data = JSON.parse(data);
-    console.log(data);
-
-    //Update the position
-    let position = data.position;
-    cubeT.position.set(position[0] * 5, position[1] * 5, position[2] * 5);
-    //rotate(data.rotation);
-
-    //Allow panning of object without moving the object
-    scene.updateMatrixWorld(true);
-    var positionNew = new THREE.Vector3();
-    positionNew.setFromMatrixPosition( cubeT.matrixWorld );
-
-    controls.target = positionNew;
-
-    rotate(data.rotation);
+    updateTurtle(data);
 });
 
 //Get the world data
-window.api.receive("world", (data) => {
-    world = data.WorldData.blocks;
+window.api.receive("backSynchWorldData", (data) => {
     updateWorld(data.turtle, data.WorldData.blocks);
 });
 
@@ -160,9 +154,7 @@ for(var j = 0; j < InteractionContainers.length; j++) {
             let command = this.getAttribute("data-command");
 
             if(command == "getWorld") {
-                window.api.send("frontGetWorld", command);
-            } else if(command == "detect") {
-                window.api.send("frontDetect", command);
+                window.api.send("frontSynchWorld", command);
             } else if(command == "updateWorld") {
                 let worldData = [];
                 for (let [key, value] of objectMap) {
@@ -171,6 +163,8 @@ for(var j = 0; j < InteractionContainers.length; j++) {
                 }
 
                 window.api.send("frontUpdateWorld", worldData);
+            } else if(command == "printTurtleData") {
+                window.api.send("frontPrintAllTurtleData");
             } else {
                 window.api.send("frontAction", command);
             }
@@ -191,8 +185,6 @@ document.addEventListener('keydown', function(event) {
         window.api.send("frontAction", "up");
     } else if(event.shiftKey) {
         window.api.send("frontAction", "down");
-    } else if(event.key == 'f') {
-        window.api.send("frontDetect", "");
     }
 });
 
@@ -219,7 +211,6 @@ addEventListener('mousemove', (event) => {
 
     if(object != undefined) {
         document.body.style.cursor = 'pointer';
-        //object.material.color.set();
     } else {
         document.body.style.cursor = 'default';
     }

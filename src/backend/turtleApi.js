@@ -13,50 +13,25 @@ function detectAll() {
   });
 }
 
+function updateTurtleData() {
+  let data = server.turtles[0].getTurtleData();
+
+  win.webContents.send("updateTurtleData", JSON.stringify(data));
+}
+
 //I dont think this needs to be async, test later I guess
 ipcMain.on("frontAction", async (event, args) => {
-  if (args == "forward") {
-    await server.turtles[0].moveForward();
-  } else if (args == "turnRight") {
-    await server.turtles[0].turnRight();
-  } else if (args == "turnLeft") {
-    await server.turtles[0].turnLeft();
-  } else if (args == "up") {
-    await server.turtles[0].moveUp();
-  } else if (args == "down") {
-    await server.turtles[0].moveDown();
-  } else if (args == "back") {
-    await server.turtles[0].moveBackward();
-  } else if (args == "digUp") {
-    await server.turtles[0].digUp();
-  } else if (args == "digForward") {
-    await server.turtles[0].digForward();
-  } else if (args == "digDown") {
-    await server.turtles[0].digDown();
-  } else if (args == "stats") {
-    console.log(server.turtles[0].getStats());
-  }
+  await server.turtles[0].executeAction(args);
 
   //When you move update the turtle position
-  let position = server.turtles[0].getPositionAsJSON();
-  let data = {
-    "position": position,
-    "rotation": server.turtles[0].rotation
-  }
-  win.webContents.send("updateTurtlePosition", JSON.stringify(data));
+  updateTurtleData();
 
   //On movement detect
   detectAll();
 });
 
-//Gets all the names of the models inside of the models folder and sends it to the front end
-function sendModels() {
-    var files = fs.readdirSync('./src/frontend/models/');
-    win.webContents.send("models", JSON.stringify(files));
-}
-
 //When called return world data
-ipcMain.on("frontGetWorld", (event, args) => {
+ipcMain.on("frontSynchWorld", (event, args) => {
   fs.readFile("./src/backend/worlds/exampleWorld.json", (err, data) => {
     let jsonData = JSON.parse(data);
     let jsonTurtle = jsonData.turtle;
@@ -66,14 +41,10 @@ ipcMain.on("frontGetWorld", (event, args) => {
       jsonTurtle.z
     );
     server.turtles[0].rotation = jsonTurtle.rotation;
-    win.webContents.send("world", jsonData);
-    sendModels();
+    server.turtles[0].fuel = jsonTurtle.fuel;
+    server.turtles[0].computerId = jsonTurtle.computerId;
+    win.webContents.send("backSynchWorldData", jsonData);
   });
-});
-
-//When called return detected blocks
-ipcMain.on("frontDetect", (event, args) => {
-  detectAll();
 });
 
 //Update world
@@ -99,6 +70,14 @@ ipcMain.on("frontUpdateWorld", (event, args) => {
     JSON.stringify(worldD),
     (err) => {}
   );
+});
+
+//Print the turtle data
+ipcMain.on("frontPrintAllTurtleData", (event, args) => {
+
+  server.turtles.forEach(turtle => {
+    console.log(turtle.getStats());
+  })
 });
 
 function updateWin(_win) {

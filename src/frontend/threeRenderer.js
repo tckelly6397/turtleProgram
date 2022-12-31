@@ -39,21 +39,13 @@ export var cubeT = new THREE.Object3D();
 
 //The turtle object
 let loader = new GLTFLoader();
-//Update 3D Model
-window.api.receive("models", (data) => {
-    data = JSON.parse(data);
-    let name = data[Math.floor(Math.random()*data.length)];
 
-    //TEMPORARY FOR ROTATION
-    //name = "untitled.glb";
+loader.load('./models/untitled.glb', function(gltf) {
+    cubeT = gltf.scene.children[0];
+    cubeT.scale.set(2.5, 2.5, 2.5);
+    scene.add(gltf.scene);
 
-    loader.load('./models/' + name, function(gltf) {
-        cubeT = gltf.scene.children[0];
-        cubeT.scale.set(2.5, 2.5, 2.5);
-        scene.add(gltf.scene);
-
-        cubeT.position.set(10, 5, 2);
-    });
+    cubeT.position.set(10, 5, 2);
 });
 
 // Call the animate function
@@ -75,5 +67,3 @@ function animate() {
     // Render the scene
     renderer.render(scene, camera);
 }
-
-//module.exports = { scene, cubeT };

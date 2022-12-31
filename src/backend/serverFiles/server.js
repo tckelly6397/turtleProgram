@@ -4,7 +4,7 @@
 */
 
 const { WebSocketServer } = require("ws");
-const Turtle = require("./Turtle.js");
+const { Turtle, Actions } = require("./Turtle.js");
 
 //The port
 const port = 2553;
@@ -20,11 +20,11 @@ wss.on('connection', async (ws) => {
     let turtle = new Turtle(ws);
     turtles.push(turtle);
 
+    //Display
+    console.log("Turtle connected: " + await turtle.executeAction(Actions.GETLABEL));
+
     //Update the turtles data
     await turtle.updateMetaData();
-
-    //Display
-    console.log("Turtle connected: " + await turtle.getLabel());
 });
 
 //Display the server is running
@@ -34,14 +34,14 @@ console.log(`Listening at ${port}...`);
 //If turtle doesn't respond by next ping then remove the turtle
 function pingTurtles() {
     turtles.forEach(turtle => {
-        turtle.getLabel().catch(e => {
+        turtle.executeAction(Actions.GETLABEL).catch(e => {
             console.log("Turtle disconnected: " + turtle.label);
 
             //Remove the turtle
             const index = turtles.indexOf(turtle);
-                if (index > -1) {
-                    turtles.splice(index, 1);
-                }
+            if (index > -1) {
+                turtles.splice(index, 1);
+            }
         });
     });
 

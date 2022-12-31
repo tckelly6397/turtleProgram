@@ -6,6 +6,25 @@
 
 const { Vector3 } = require("three");
 
+const Actions = {
+	FORWARD: "forward",
+	BACK: "back",
+	UP: "up",
+	DOWN: "down",
+    TURNRIGHT: "turnRight",
+    TURNLEFT: "turnLeft",
+    DIGFORWARD: "digForward",
+    DIGUP: "digUp",
+    DIGDOWN: "digDown",
+    GETLABEL: "getLabel",
+    GETFUEL: "getFuel",
+    COMPUTERID: "getComputerId",
+    DETECTUP: "detectUp",
+    DETECTFORWARD: "detectForward",
+    DETECTDOWN: "detectDown",
+    STATS: "stats"
+}
+
 class Turtle {
     label;
     inventory;
@@ -15,6 +34,7 @@ class Turtle {
     ws;
     busy;
     computerId;
+    actionMap;
 
     constructor(ws) {
         this.inventory = [];
@@ -22,6 +42,25 @@ class Turtle {
         this.rotation = 0;
         this.ws = ws;
         this.busy = false;
+
+        this.actionMap = {
+            "forward": () => {return this.moveForward();},
+            "back": () => {return this.moveBackward();},
+            "up": () => {return this.moveUp();},
+            "down": () => {return this.moveDown();},
+            "turnRight": () => {return this.turnRight();},
+            "turnLeft": () => {return this.turnLeft();},
+            "digForward": async () => {return (await this.execute("turtle.dig()")).callback;},
+            "digUp": async () => {return (await this.execute("turtle.digUp()")).callback;},
+            "digDown": async () => {return (await this.execute("turtle.digDown()")).callback;},
+            "getLabel": async () => {return (await this.execute("os.getComputerLabel()")).callback;},
+            "getFuel": async () => {return (await this.execute("turtle.getFuelLevel()")).callback;},
+            "getComputerId": async () => {return (await this.execute("os.getComputerID()")).callback;},
+            "detectUp": async () => {return (await this.execute("turtle.inspectUp()"));},
+            "detectForward": async () => {return (await this.execute("turtle.inspect()"));},
+            "detectDown": async () => {return (await this.execute("turtle.inspectDown()"));},
+            "stats": async () => {return this.getStats;}
+        }
     }
 
     //Functions ===
@@ -29,15 +68,22 @@ class Turtle {
     //Move functions
     //Stats functions
     //Get Map data
+
+    async executeAction(action) {
+        var startTime = performance.now()
+
+        let data = await this.actionMap[action]();
+
+        var endTime = performance.now();
+        console.log(`action ${action} took ${endTime - startTime} milliseconds`)
+
+        return data;
+    }
+
     async updateMetaData() {
-
-        this.fuel = await this.getFuel();
-        this.computerId = await this.getComputerId();
-        this.label = await this.getLabel();
-
-       console.log(await this.getFuel());
-       console.log(await this.getComputerId());
-       console.log(await this.getLabel());
+        this.fuel = await this.executeAction(Actions.GETFUEL);
+        this.computerId = await this.executeAction(Actions.COMPUTERID);
+        this.label = await this.executeAction(Actions.GETLABEL);
     }
 
     async turnRight() {
@@ -62,7 +108,6 @@ class Turtle {
 
     async moveForward() {
         const data = await this.execute("turtle.forward()");
-        console.log(data);
 
         if(data.callback === true) {
             this.position.add(new Vector3(Math.round(Math.cos(this.rotation * (Math.PI/180))), 0, Math.round(Math.sin(this.rotation * (Math.PI/180)))));
@@ -101,56 +146,6 @@ class Turtle {
         return data.callback;
     }
 
-    async digForward() {
-        const data = await this.execute("turtle.dig()");
-        return data.callback;
-    }
-
-    async digDown() {
-        const data = await this.execute("turtle.digDown()");
-        return data.callback;
-    }
-
-    async digUp() {
-        const data = await this.execute("turtle.digUp()");
-        return data.callback;
-    }
-
-    async getLabel() {
-        const data = await this.execute("os.getComputerLabel()");
-        return data.callback;
-    }
-
-    async getLabel() {
-        const data = await this.execute("os.getComputerLabel()");
-        return data.callback;
-    }
-
-    async getFuel() {
-        const data = await this.execute("turtle.getFuelLevel()");
-        return data.callback;
-    }
-
-    async getComputerId() {
-        const data = await this.execute("os.getComputerID()");
-        return data.callback;
-    }
-
-    async detectUp() {
-        const data = await this.execute("turtle.inspectUp()");
-        return data;
-    }
-
-    async detectForward() {
-        const data = await this.execute("turtle.inspect()");
-        return data;
-    }
-
-    async detectDown() {
-        const data = await this.execute("turtle.inspectDown()");
-        return data;
-    }
-
     waitFor(conditionFunction) {
         const poll = resolve => {
           if(conditionFunction()) resolve();
@@ -178,6 +173,7 @@ class Turtle {
         return new Promise((resolve, reject) => {
             this.ws.on('message', (message) => {
                 this.busy = false;
+
                 resolve(JSON.parse(message));
             });
 
@@ -189,27 +185,31 @@ class Turtle {
     }
 
     getStats() {
-        return "{" + this.label + ", " + this.computerId + ", " + this.inventory +
+        return "{label: " + this.label + ", computerId: " + this.computerId + ", Inventory: " + this.inventory +
         ", position{" + this.position.x + ", " + this.position.y + ", " + this.position.z + "}" +
-        ", " + this.rotation + ", " + this.fuel + "}";
+        ", rotation: " + this.rotation + ", fuel: " + this.fuel + "}";
     }
 
-    getPositionAsJSON() {
-        let coords = [
-            this.position.x,
-            this.position.y,
-            this.position.z
-        ]
+    getTurtleData() {
+        let data = {
+            "label": this.label,
+            "computerId": this.computerId,
+            "fuel": this.fuel,
+            "rotation": this.rotation,
+            "x": this.position.x,
+            "y": this.position.y,
+            "z": this.position.z
+        }
 
-        return coords;
+        return data;
     }
 
     //Returns a list of blocks based on the detection of the turtle
     async detect() {
         let blocks = [];
-        let top = await this.detectUp();
-        let down = await this.detectDown();
-        let forward = await this.detectForward();
+        let top = await this.executeAction(Actions.DETECTUP);
+        let down = await this.executeAction(Actions.DETECTDOWN);
+        let forward = await this.executeAction(Actions.DETECTFORWARD);
 
         let blockU = {
             "name": (top.callback) ? top.extra.name : "air",
@@ -240,4 +240,4 @@ class Turtle {
     }
 }
 
-module.exports = Turtle;
+module.exports = { Turtle, Actions };
