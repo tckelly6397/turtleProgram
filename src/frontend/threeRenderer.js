@@ -32,21 +32,12 @@ controls.rotateSpeed = 1;
 controls.enableDamping = true;
 controls.dampingFactor = 0.2;
 
-//Create the geometry of a cube of size 5
-//Create a material applying the color and an opacity, defining its transparent
-//Create a mesh applying the geometry and material
-//Set the position of the mesh
-//Add the cube to the scene
-//const geometryT = new THREE.BoxGeometry( 5, 5, 5 );
-//const materialT = new THREE.MeshBasicMaterial( {color: 0xf1332d } );
-//export var cubeT = new THREE.Mesh( geometryT, materialT );
-//cubeT.position.set(15, 5, 0);
-//scene.add( cubeT );
-
+//Create lighting so model can have color
 const light = new THREE.AmbientLight( 0xffffff ); // soft white light
 scene.add( light );
 export var cubeT = new THREE.Object3D();
 
+//The turtle object
 let loader = new GLTFLoader();
 //Update 3D Model
 window.api.receive("models", (data) => {

@@ -7,13 +7,6 @@
 const { Vector3 } = require("three");
 
 class Turtle {
-    //Variables ===
-    //Label
-    //Inventory
-    //Position
-    //Rotation
-    //Fuel level
-    //Map data
     label;
     inventory;
     position;
@@ -29,16 +22,6 @@ class Turtle {
         this.rotation = 0;
         this.ws = ws;
         this.busy = false;
-
-        this.getLabel().then(value => {
-                this.label = value;
-                this.getFuel().then(value => {
-                    this.fuel = value;
-                    this.getComputerId().then(value => {
-                        this.computerId = value;
-                    });
-                });
-            });
     }
 
     //Functions ===
@@ -46,6 +29,17 @@ class Turtle {
     //Move functions
     //Stats functions
     //Get Map data
+    async updateMetaData() {
+
+        this.fuel = await this.getFuel();
+        this.computerId = await this.getComputerId();
+        this.label = await this.getLabel();
+
+       console.log(await this.getFuel());
+       console.log(await this.getComputerId());
+       console.log(await this.getLabel());
+    }
+
     async turnRight() {
         const data = await this.execute("turtle.turnRight()");
 
@@ -158,10 +152,9 @@ class Turtle {
     }
 
     waitFor(conditionFunction) {
-
         const poll = resolve => {
           if(conditionFunction()) resolve();
-          else setTimeout(_ => poll(resolve), 10);
+          else setTimeout(_ => poll(resolve), 5);
         }
 
         return new Promise(poll);
@@ -169,8 +162,10 @@ class Turtle {
 
     //Send data to a Turtle and execute it, returning what the command executes within the turtle as a Promise
     async execute(value) {
+        //Wait until commands are done
         await this.waitFor(_ => this.busy === false);
         this.busy = true;
+
         //Add any data necessary to this JSON object
         let data = {
             "command": "return " + value
@@ -185,6 +180,11 @@ class Turtle {
                 this.busy = false;
                 resolve(JSON.parse(message));
             });
+
+            //Took too long
+            setTimeout(() => {
+                reject("Error");
+            }, 1000);
         });
     }
 

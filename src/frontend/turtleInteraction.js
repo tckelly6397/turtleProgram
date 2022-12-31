@@ -8,11 +8,6 @@ let objectMap = new Map();
 
 //Rotate the turtle
 function rotate(angle) {
-    //declared once at the top of your code
-    //var axis = new THREE.Vector3(0,1,0);//tilted a bit on x and y - feel free to plug your different axis here
-    //in your update/draw function
-    //var rad = angle * Math.PI / 180;
-    //cubeT.rotateOnAxis(axis,rad);
     cubeT.rotation.y = -angle * Math.PI / 180;
 }
 
@@ -152,7 +147,7 @@ window.api.receive("retrieveAndUpdateWorldData", (data) => {
         worldData.push(key);
     }
 
-    window.api.send("updateWorld", worldData);
+    window.api.send("frontUpdateWorld", worldData);
 });
 
 
@@ -165,9 +160,9 @@ for(var j = 0; j < InteractionContainers.length; j++) {
             let command = this.getAttribute("data-command");
 
             if(command == "getWorld") {
-                window.api.send("getWorld", command);
+                window.api.send("frontGetWorld", command);
             } else if(command == "detect") {
-                window.api.send("detect", command);
+                window.api.send("frontDetect", command);
             } else if(command == "updateWorld") {
                 let worldData = [];
                 for (let [key, value] of objectMap) {
@@ -175,9 +170,9 @@ for(var j = 0; j < InteractionContainers.length; j++) {
                     worldData.push(key);
                 }
 
-                window.api.send("updateWorld", worldData);
+                window.api.send("frontUpdateWorld", worldData);
             } else {
-                window.api.send("action", command);
+                window.api.send("frontAction", command);
             }
         }
     }
@@ -185,23 +180,23 @@ for(var j = 0; j < InteractionContainers.length; j++) {
 
 document.addEventListener('keydown', function(event) {
     if(event.key == 'w') {
-        window.api.send("action", "forward");
+        window.api.send("frontAction", "forward");
     } else if(event.key == 'a') {
-        window.api.send("action", "turnLeft");
+        window.api.send("frontAction", "turnLeft");
     } else if(event.key == 'd') {
-        window.api.send("action", "turnRight");
+        window.api.send("frontAction", "turnRight");
     } else if(event.key == 's') {
-        window.api.send("action", "back");
+        window.api.send("frontAction", "back");
     } else if(event.key == ' ') {
-        window.api.send("action", "up");
+        window.api.send("frontAction", "up");
     } else if(event.shiftKey) {
-        window.api.send("action", "down");
+        window.api.send("frontAction", "down");
     } else if(event.key == 'f') {
-        window.api.send("detect", "");
+        window.api.send("frontDetect", "");
     }
 });
 
-function getIntersection() {
+function getIntersection(event) {
     var mouse = new THREE.Vector2();
     mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
     mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;

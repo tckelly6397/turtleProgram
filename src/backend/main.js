@@ -4,7 +4,6 @@
 const { app, BrowserWindow, dialog } = require('electron');
 const path = require("path");
 const turtleApi = require("./turtleApi");
-const fs = require('fs');
 
 var win;
 
@@ -34,7 +33,12 @@ function createWindow () {
 
   //On close ask to save
   win.on('close', e => {
-    e.preventDefault()
+    windowCloseEvent(e);
+  });
+}
+
+function windowCloseEvent(e) {
+  e.preventDefault()
     dialog.showMessageBox({
       type: 'question',
       buttons: ['Cancel', 'Yes', 'No'],
@@ -43,19 +47,18 @@ function createWindow () {
       title: 'Save before quitting?',
       detail: 'Save world before exiting?'
     }).then(async ({ response, checkboxChecked }) => {
-      console.log(`response: ${response}`)
       if (response == 2) {
         win.destroy()
         app.quit()
       } else if (response == 1) {
+        //Save
         win.webContents.send("retrieveAndUpdateWorldData");
 
         await delay(500);
         win.destroy();
         app.quit();
       }
-    })
-  })
+    });
 }
 
 app.whenReady().then(() => {

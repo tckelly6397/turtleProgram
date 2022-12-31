@@ -5,6 +5,7 @@ const { ipcMain } = require('electron');
 
 let win;
 
+//Call detect on the turtle and send the data to the frontend
 function detectAll() {
   let jsonData = server.turtles[0].detect();
   jsonData.then((data) => {
@@ -12,7 +13,8 @@ function detectAll() {
   });
 }
 
-ipcMain.on("action", async (event, args) => {
+//I dont think this needs to be async, test later I guess
+ipcMain.on("frontAction", async (event, args) => {
   if (args == "forward") {
     await server.turtles[0].moveForward();
   } else if (args == "turnRight") {
@@ -47,14 +49,14 @@ ipcMain.on("action", async (event, args) => {
   detectAll();
 });
 
+//Gets all the names of the models inside of the models folder and sends it to the front end
 function sendModels() {
     var files = fs.readdirSync('./src/frontend/models/');
-    console.log(files);
     win.webContents.send("models", JSON.stringify(files));
 }
 
 //When called return world data
-ipcMain.on("getWorld", (event, args) => {
+ipcMain.on("frontGetWorld", (event, args) => {
   fs.readFile("./src/backend/worlds/exampleWorld.json", (err, data) => {
     let jsonData = JSON.parse(data);
     let jsonTurtle = jsonData.turtle;
@@ -70,13 +72,13 @@ ipcMain.on("getWorld", (event, args) => {
 });
 
 //When called return detected blocks
-ipcMain.on("detect", (event, args) => {
+ipcMain.on("frontDetect", (event, args) => {
   detectAll();
 });
 
 //Update world
 //Args are all the new blocks
-ipcMain.on("updateWorld", (event, args) => {
+ipcMain.on("frontUpdateWorld", (event, args) => {
   let worldD = {
     turtle: {
       label: server.turtles[0].label,

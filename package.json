@@ -5,6 +5,7 @@
   "main": "./src/backend/main.js",
   "scripts": {
     "start": "electron .",
+    "electron-trace": "electron --trace-warnings .",
     "wsServer": "./src/backend/serverFiles/server.js"
   },
   "repository": {
