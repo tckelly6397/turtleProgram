@@ -14,7 +14,6 @@
     text-align: center;
     text-decoration: none;
     font-size: 12px;
-    outline: black;
 }
 
 #interaction-buttons Button:hover {
@@ -25,4 +24,52 @@
 #info-area {
     position: relative;
     color: white;
+}
+
+#top-area {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.interaction-container {
+    display: flex;
+    flex-direction: column;
+
+    margin-left: 3px;
+    margin-right: 3px;
+}
+
+.interaction-container Button:hover {
+    cursor: pointer;
+    filter: brightness(80%);
+    -webkit-filter: brightness(80%);
+}
+
+.interaction-container Button:active {
+    filter: brightness(60%);
+    -webkit-filter: brightness(60%);
+}
+
+.interaction-container Button {
+    position: relative;
+
+    border: 2px solid;
+    padding: 5px 5px;
+}
+
+#dig-container Button {
+    background-color: rgb(255, 0, 0);
+    border-color: rgb(175, 0, 0);
+}
+
+#move-container Button {
+    background-color: rgb(0, 206, 51);
+    border-color: rgb(0, 133, 22);
+}
+
+#attack-container Button {
+    background-color: rgb(233, 198, 0);
+    border-color: rgb(163, 134, 2);
 }

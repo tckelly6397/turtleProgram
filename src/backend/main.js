@@ -4,6 +4,7 @@
 const { app, BrowserWindow, dialog } = require('electron');
 const path = require("path");
 const turtleApi = require("./turtleApi");
+const fs = require('fs');
 
 var win;
 
@@ -58,7 +59,7 @@ function createWindow () {
 }
 
 app.whenReady().then(() => {
-  createWindow()
+  createWindow();
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {

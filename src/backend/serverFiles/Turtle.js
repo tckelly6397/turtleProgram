@@ -201,7 +201,7 @@ class Turtle {
             this.position.z
         ]
 
-        return JSON.stringify(coords);
+        return coords;
     }
 
     //Returns a list of blocks based on the detection of the turtle

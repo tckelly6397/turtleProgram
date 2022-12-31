@@ -4,6 +4,7 @@
 
 import * as THREE from '../../build/three.module.js'
 import { OrbitControls } from '../../build/OrbitControls.js'
+import { GLTFLoader } from '../../build/GLTFLoader.js';
 
 var renderer = new THREE.WebGLRenderer();
 renderer.setPixelRatio(window.devicePixelRatio);
@@ -36,11 +37,33 @@ controls.dampingFactor = 0.2;
 //Create a mesh applying the geometry and material
 //Set the position of the mesh
 //Add the cube to the scene
-const geometryT = new THREE.BoxGeometry( 5, 5, 5 );
-const materialT = new THREE.MeshBasicMaterial( {color: 0xf1332d } );
-export var cubeT = new THREE.Mesh( geometryT, materialT );
-cubeT.position.set(15, 5, 0);
-scene.add( cubeT );
+//const geometryT = new THREE.BoxGeometry( 5, 5, 5 );
+//const materialT = new THREE.MeshBasicMaterial( {color: 0xf1332d } );
+//export var cubeT = new THREE.Mesh( geometryT, materialT );
+//cubeT.position.set(15, 5, 0);
+//scene.add( cubeT );
+
+const light = new THREE.AmbientLight( 0xffffff ); // soft white light
+scene.add( light );
+export var cubeT = new THREE.Object3D();
+
+let loader = new GLTFLoader();
+//Update 3D Model
+window.api.receive("models", (data) => {
+    data = JSON.parse(data);
+    let name = data[Math.floor(Math.random()*data.length)];
+
+    //TEMPORARY FOR ROTATION
+    //name = "untitled.glb";
+
+    loader.load('./models/' + name, function(gltf) {
+        cubeT = gltf.scene.children[0];
+        cubeT.scale.set(2.5, 2.5, 2.5);
+        scene.add(gltf.scene);
+
+        cubeT.position.set(10, 5, 2);
+    });
+});
 
 // Call the animate function
 animate();

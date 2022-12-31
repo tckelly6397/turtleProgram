@@ -4,3 +4,7 @@ A desktop application based on the Electron framework using Three.js and WebSock
 
 ## Screenshots
 ![Initial Tests](./images/example-12-30.PNG)
+<<<<<<< HEAD
+=======
+![Diamonds](./images/diamonds-12-30.PNG)
+>>>>>>> 2405a5f (Changes upon changes)

@@ -12,19 +12,7 @@ function detectAll() {
   });
 }
 
-//When called send back the turtles position
-ipcMain.on("getTurtlePosition", (event, args) => {
-  //If there is a turtle then continue
-  if (server.turtles[0] != undefined) {
-    let position = server.turtles[0].getPositionAsJSON();
-    if (position != undefined && win != "undefined") {
-      //Send the data
-      win.webContents.send("updateTurtlePosition", position);
-    }
-  }
-});
-
-ipcMain.on("move", async (event, args) => {
+ipcMain.on("action", async (event, args) => {
   if (args == "forward") {
     await server.turtles[0].moveForward();
   } else if (args == "turnRight") {
@@ -37,17 +25,33 @@ ipcMain.on("move", async (event, args) => {
     await server.turtles[0].moveDown();
   } else if (args == "back") {
     await server.turtles[0].moveBackward();
+  } else if (args == "digUp") {
+    await server.turtles[0].digUp();
+  } else if (args == "digForward") {
+    await server.turtles[0].digForward();
+  } else if (args == "digDown") {
+    await server.turtles[0].digDown();
   } else if (args == "stats") {
     console.log(server.turtles[0].getStats());
   }
 
   //When you move update the turtle position
   let position = server.turtles[0].getPositionAsJSON();
-  win.webContents.send("updateTurtlePosition", position);
+  let data = {
+    "position": position,
+    "rotation": server.turtles[0].rotation
+  }
+  win.webContents.send("updateTurtlePosition", JSON.stringify(data));
 
   //On movement detect
   detectAll();
 });
+
+function sendModels() {
+    var files = fs.readdirSync('./src/frontend/models/');
+    console.log(files);
+    win.webContents.send("models", JSON.stringify(files));
+}
 
 //When called return world data
 ipcMain.on("getWorld", (event, args) => {
@@ -61,6 +65,7 @@ ipcMain.on("getWorld", (event, args) => {
     );
     server.turtles[0].rotation = jsonTurtle.rotation;
     win.webContents.send("world", jsonData);
+    sendModels();
   });
 });
 

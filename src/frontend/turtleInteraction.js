@@ -6,6 +6,16 @@ let objects = [];
 const colorMap = new Map();
 let objectMap = new Map();
 
+//Rotate the turtle
+function rotate(angle) {
+    //declared once at the top of your code
+    //var axis = new THREE.Vector3(0,1,0);//tilted a bit on x and y - feel free to plug your different axis here
+    //in your update/draw function
+    //var rad = angle * Math.PI / 180;
+    //cubeT.rotateOnAxis(axis,rad);
+    cubeT.rotation.y = -angle * Math.PI / 180;
+}
+
 //Check if two block positions are equal
 function equalBlock(block1, block2) {
     if(block1.x == block2.x && block1.y == block2.y && block1.z == block2.z) {
@@ -96,16 +106,21 @@ function updateWorld(turtle, initialWorld) {
 window.api.receive("updateTurtlePosition", (data) => {
     //Parse the JSON String
     data = JSON.parse(data);
+    console.log(data);
 
     //Update the position
-    cubeT.position.set(data[0] * 5, data[1] * 5, data[2] * 5);
+    let position = data.position;
+    cubeT.position.set(position[0] * 5, position[1] * 5, position[2] * 5);
+    //rotate(data.rotation);
 
     //Allow panning of object without moving the object
     scene.updateMatrixWorld(true);
-    var position = new THREE.Vector3();
-    position.setFromMatrixPosition( cubeT.matrixWorld );
+    var positionNew = new THREE.Vector3();
+    positionNew.setFromMatrixPosition( cubeT.matrixWorld );
 
-    controls.target = position;
+    controls.target = positionNew;
+
+    rotate(data.rotation);
 });
 
 //Get the world data
@@ -142,43 +157,45 @@ window.api.receive("retrieveAndUpdateWorldData", (data) => {
 
 
 //Apply click events to the buttons
-var InteractionChildren = document.getElementById('interaction-buttons').children;
+var InteractionContainers = document.getElementsByClassName('interaction-container');
 
-for (var i = 0; i < InteractionChildren.length; i++) {
-    InteractionChildren[i].onclick = function () {
-        let command = this.getAttribute("data-command");
+for(var j = 0; j < InteractionContainers.length; j++) {
+    for (var i = 0; i < InteractionContainers[j].children.length; i++) {
+        InteractionContainers[j].children[i].onclick = function () {
+            let command = this.getAttribute("data-command");
 
-        if(command == "getWorld") {
-            window.api.send("getWorld", command);
-        } else if(command == "detect") {
-            window.api.send("detect", command);
-        } else if(command == "updateWorld") {
-            let worldData = [];
-            for (let [key, value] of objectMap) {
-                console.log(key);
-                worldData.push(key);
+            if(command == "getWorld") {
+                window.api.send("getWorld", command);
+            } else if(command == "detect") {
+                window.api.send("detect", command);
+            } else if(command == "updateWorld") {
+                let worldData = [];
+                for (let [key, value] of objectMap) {
+                    console.log(key);
+                    worldData.push(key);
+                }
+
+                window.api.send("updateWorld", worldData);
+            } else {
+                window.api.send("action", command);
             }
-
-            window.api.send("updateWorld", worldData);
-        } else {
-            window.api.send("move", command);
         }
     }
 }
 
 document.addEventListener('keydown', function(event) {
     if(event.key == 'w') {
-        window.api.send("move", "forward");
+        window.api.send("action", "forward");
     } else if(event.key == 'a') {
-        window.api.send("move", "turnLeft");
+        window.api.send("action", "turnLeft");
     } else if(event.key == 'd') {
-        window.api.send("move", "turnRight");
+        window.api.send("action", "turnRight");
     } else if(event.key == 's') {
-        window.api.send("move", "back");
+        window.api.send("action", "back");
     } else if(event.key == ' ') {
-        window.api.send("move", "up");
+        window.api.send("action", "up");
     } else if(event.shiftKey) {
-        window.api.send("move", "down");
+        window.api.send("action", "down");
     } else if(event.key == 'f') {
         window.api.send("detect", "");
     }
@@ -225,10 +242,13 @@ addEventListener('mousedown', (event) => {
             document.getElementById("info-area").innerText = block.name;
         }
 
+        //Set target to block
+        /*
         scene.updateMatrixWorld(true);
         var position = new THREE.Vector3();
         position.setFromMatrixPosition( object.matrixWorld );
 
         controls.target = position;
+        */
     }
 });
