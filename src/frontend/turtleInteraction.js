@@ -4,6 +4,7 @@ import * as THREE from '../../build/three.module.js'
 let objects = [];
 const colorMap = new Map();
 let objectMap = new Map();
+let turtleList;
 
 //Rotate the turtle
 function rotate(angle) {
@@ -50,6 +51,17 @@ function removeBlock(block) {
             scene.remove(value);
             break;
         }
+    }
+}
+
+function clearAllBlocks() {
+    for (let [key, value] of objectMap) {
+        const index = objects.indexOf(value);
+        if (index > -1) {
+            objects.splice(index, 1);
+        }
+        objectMap.delete(key);
+        scene.remove(value);
     }
 }
 
@@ -115,7 +127,13 @@ window.api.receive("updateTurtleData", (data) => {
 
 //Get the world data
 window.api.receive("backSynchWorldData", (data) => {
-    updateWorld(data.turtle, data.WorldData.blocks);
+    //Clear the world
+    clearAllBlocks();
+
+    if(data != undefined) {
+        console.log(data);
+        updateWorld(data.turtle, data.blocks);
+    }
 });
 
 //Updating detection
@@ -134,16 +152,43 @@ window.api.receive("detected", (data) => {
     }
 });
 
-window.api.receive("retrieveAndUpdateWorldData", (data) => {
+function getUpdateWorldData() {
     let worldData = [];
     for (let [key, value] of objectMap) {
         console.log(key);
         worldData.push(key);
     }
 
-    window.api.send("frontUpdateWorld", worldData);
+    let args = {
+        "blocks": worldData,
+        "turtleList": turtleList
+    }
+
+    window.api.send("frontUpdateWorld", JSON.stringify(args));
+}
+
+window.api.receive("retrieveAndUpdateWorldData", (data) => {
+    getUpdateWorldData();
 });
 
+//Retrieve the turtle list
+//Loop through it and apply to the drop down list
+window.api.receive("backSendTurtleList", (data) => {
+    let turtleDrop = document.getElementById("turtle-list");
+    turtleDrop.innerHTML = '';
+
+    //For each turtle in the list add it to the drop down list
+    data.forEach(t => {
+        let element = document.createElement("a");
+        element.classList.add("dropdown-item");
+        element.innerText = t.label + "(" + t.computerId + ")";
+        let clickCommand = "window.api.send(\"frontSelectTurtle\", " + JSON.stringify(t) + ");"
+        element.setAttribute("onclick", clickCommand);
+        turtleDrop.appendChild(element);
+    });
+
+    turtleList = data;
+});
 
 //Apply click events to the buttons
 var InteractionContainers = document.getElementsByClassName('interaction-container');
@@ -156,13 +201,7 @@ for(var j = 0; j < InteractionContainers.length; j++) {
             if(command == "getWorld") {
                 window.api.send("frontSynchWorld", command);
             } else if(command == "updateWorld") {
-                let worldData = [];
-                for (let [key, value] of objectMap) {
-                    console.log(key);
-                    worldData.push(key);
-                }
-
-                window.api.send("frontUpdateWorld", worldData);
+                getUpdateWorldData();
             } else if(command == "printTurtleData") {
                 window.api.send("frontPrintAllTurtleData");
             } else {

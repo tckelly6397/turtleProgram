@@ -3,7 +3,8 @@
 */
 const { app, BrowserWindow, dialog } = require('electron');
 const path = require("path");
-const turtleApi = require("./turtleApi");
+const turtleApi = require("./serverFiles/turtleApi");
+const server = require("./serverFiles/server");
 
 var win;
 
@@ -28,8 +29,9 @@ function createWindow () {
 
   win.loadFile(`./src/frontend/index.html`);
 
-  //Set the turtleApis win
+  //Set the turtleApis and server win
   turtleApi.updateWin(win);
+  server.updateWin(win);
 
   //On close ask to save
   win.on('close', e => {

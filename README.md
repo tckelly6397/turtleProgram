@@ -14,7 +14,6 @@ https://pastebin.com/SYnheFxj
 -Make the interaction between front-end and back-end more understandable\
 -Clean up front-end code\
 -More comments\
--An actual save load system\
 -Inventory system\
 -Better controls\
 -Error handling

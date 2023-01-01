@@ -5,6 +5,7 @@
 //Turtle code: https://patebin.com/6ZnajFGz
 
 const { Vector3 } = require("three");
+const fs = require('fs');
 
 const Actions = {
 	FORWARD: "forward",
@@ -22,7 +23,8 @@ const Actions = {
     DETECTUP: "detectUp",
     DETECTFORWARD: "detectForward",
     DETECTDOWN: "detectDown",
-    STATS: "stats"
+    STATS: "stats",
+    SETLABEL: "setLabel"
 }
 
 class Turtle {
@@ -35,6 +37,7 @@ class Turtle {
     busy;
     computerId;
     actionMap;
+    mapLocation;
 
     constructor(ws) {
         this.inventory = [];
@@ -42,6 +45,7 @@ class Turtle {
         this.rotation = 0;
         this.ws = ws;
         this.busy = false;
+        this.mapLocation = undefined;
 
         this.actionMap = {
             "forward": () => {return this.moveForward();},
@@ -59,6 +63,7 @@ class Turtle {
             "detectUp": async () => {return (await this.execute("turtle.inspectUp()"));},
             "detectForward": async () => {return (await this.execute("turtle.inspect()"));},
             "detectDown": async () => {return (await this.execute("turtle.inspectDown()"));},
+            "setLabel": async (name) => {return (await this.execute("os.setComputerLabel(" + "\"" + name + "\"" + ")"));},
             "stats": async () => {return this.getStats;}
         }
     }
@@ -69,13 +74,13 @@ class Turtle {
     //Stats functions
     //Get Map data
 
-    async executeAction(action) {
+    async executeAction(action, args) {
         var startTime = performance.now()
 
-        let data = await this.actionMap[action]();
+        let data = await this.actionMap[action](args);
 
         var endTime = performance.now();
-        console.log(`action ${action} took ${endTime - startTime} milliseconds`)
+        //console.log(`action ${action} took ${endTime - startTime} milliseconds`)
 
         return data;
     }
@@ -84,6 +89,20 @@ class Turtle {
         this.fuel = await this.executeAction(Actions.GETFUEL);
         this.computerId = await this.executeAction(Actions.COMPUTERID);
         this.label = await this.executeAction(Actions.GETLABEL);
+
+        if(this.label == undefined) {
+            //Get a random name
+            let names = fs.readFileSync("./src/backend/serverFiles/TurtleData/names.json", {encoding:'utf8', flag:'r'});
+            names = JSON.parse(names);
+            let name = names[Math.ceil(Math.random() * names.length)];
+
+            await this.executeAction(Actions.SETLABEL, name);
+            this.label = await this.executeAction(Actions.GETLABEL);
+        }
+
+        if(this.mapLocation == undefined) {
+            this.mapLocation = this.label + "World.json";
+        }
     }
 
     async turnRight() {
@@ -187,7 +206,7 @@ class Turtle {
     getStats() {
         return "{label: " + this.label + ", computerId: " + this.computerId + ", Inventory: " + this.inventory +
         ", position{" + this.position.x + ", " + this.position.y + ", " + this.position.z + "}" +
-        ", rotation: " + this.rotation + ", fuel: " + this.fuel + "}";
+        ", rotation: " + this.rotation + ", fuel: " + this.fuel + ", world: " + this.mapLocation + "}";
     }
 
     getTurtleData() {
@@ -198,7 +217,8 @@ class Turtle {
             "rotation": this.rotation,
             "x": this.position.x,
             "y": this.position.y,
-            "z": this.position.z
+            "z": this.position.z,
+            "mapLocation": this.mapLocation
         }
 
         return data;

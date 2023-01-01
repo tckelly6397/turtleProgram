@@ -22,13 +22,13 @@ contextBridge.exposeInMainWorld(
     "api", {
         send: (channel, data) => {
             // whitelist channels
-            let validChannels = ["frontAction", "frontSynchWorld", "frontUpdateWorld", "frontPrintAllTurtleData"];
+            let validChannels = ["frontAction", "frontSynchWorld", "frontUpdateWorld", "frontPrintAllTurtleData", "frontSelectTurtle"];
             if (validChannels.includes(channel)) {
                 ipcRenderer.send(channel, data);
             }
         },
         receive: (channel, func) => {
-            let validChannels = ["updateTurtleData", "backSynchWorldData", "detected", "retrieveAndUpdateWorldData"];
+            let validChannels = ["updateTurtleData", "backSynchWorldData", "detected", "retrieveAndUpdateWorldData", "backSendTurtleList"];
             if (validChannels.includes(channel)) {
                 // Deliberately strip event as it includes `sender`
                 ipcRenderer.on(channel, (event, ...args) => func(...args));

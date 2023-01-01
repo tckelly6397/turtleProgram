@@ -73,3 +73,8 @@
     background-color: rgb(233, 198, 0);
     border-color: rgb(163, 134, 2);
 }
+
+.dropdown-menu{
+    height:200px;
+    overflow-y:auto;
+}
