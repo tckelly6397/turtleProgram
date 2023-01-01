@@ -3,25 +3,36 @@
 * the server to send data to each client.
 */
 
+/*=========================== Imports ===========================*/
 const { WebSocketServer } = require("ws");
 const { Turtle, Actions } = require("./Turtle.js");
+const SaveLoadManager = require("./SaveLoadManager.js");
 const fs = require('fs');
 
-//The port
+/*=========================== Variables ===========================*/
 const port = 2553;
-
-//WebSocket server started on this machine on specified port
 const wss = new WebSocketServer({port});
-
-//Display the server is running
-console.log(`Listening at ${port}...`);
-
 let turtles = [];
 let turtleList;
 let win;
 
-synchTurtleList();
+//Display the server is running
+console.log(`Listening at ${port}...`);
 
+//Update local turtleList
+synchTurtleList();
+SaveLoadManager.initialize();
+
+//Begin pinging turtles
+pingTurtles();
+
+/*=========================== functions ===========================*/
+//Update the local window
+function updateWin(_win) {
+    win = _win;
+}
+
+//Gets data from turtleList.json and applies it to the local turtleList
 function synchTurtleList() {
     fs.readFile("./src/backend/serverFiles/TurtleData/turtleList.json", (err, data) => {
         turtleList = JSON.parse(data);
@@ -34,31 +45,21 @@ function synchTurtleList() {
 //Create a new turtle data in the turtleList.json
 function createNewTurtle(turtle) {
     console.log("Creating new turtle data: " + turtle.label);
-    let newTurtle = {
-        "label": turtle.label,
-        "computerId": turtle.computerId,
-        "fuel": turtle.fuel,
-        "rotation": turtle.rotation,
-        "x": turtle.position.x,
-        "y": turtle.position.y,
-        "z": turtle.position.z,
-        "mapLocation": turtle.mapLocation
-    }
 
     //Add it to the list
-    turtleList.push(newTurtle);
+    turtleList.push(turtle.getTurtleData());
 
     //Write to the turtleList file
     fs.writeFileSync(
         "./src/backend/serverFiles/TurtleData/turtleList.json",
         JSON.stringify(turtleList),
         (err) => {}
-      );
-
-      synchTurtleList();
+    );
 }
 
-//Look for the turtle in the list of turtles, if it is not there then add it to the list and write to the file
+//Look for the turtle in the list of turtles
+//If the turtle is there then update its data
+//If the turtle is not there then create a new data in the list of turtles and write to the file
 function synchTurtleData(turtle) {
     for(let i = 0; i < turtleList.length; i++) {
         let t = turtleList[i];
@@ -66,9 +67,11 @@ function synchTurtleData(turtle) {
         if(t.label === turtle.label && t.computerId === turtle.computerId) {
             console.log("Turtle data found for: " + turtle.label);
 
+            //Applying the new data
             turtle.position.x = t.x;
             turtle.position.y = t.y;
             turtle.position.z = t.z;
+            turtle.fuel = t.fuel;
             turtle.rotation = t.rotation;
             turtle.fuel = t.fuel;
             turtle.mapLocation = t.mapLocation;
@@ -81,22 +84,6 @@ function synchTurtleData(turtle) {
     //Create a new turtle data
     createNewTurtle(turtle);
 }
-
-//When a websocket connects to the server create a new Turtle object passing in it's
-//Corresponding WebSocket
-wss.on('connection', async (ws) => {
-    let turtle = new Turtle(ws);
-    turtles.push(turtle);
-
-    //Display
-    console.log("Turtle connected: " + await turtle.executeAction(Actions.GETLABEL));
-
-    //Update the turtles data
-    await turtle.updateMetaData();
-
-    //Synchs the position and name, if there is not turtle create a new one
-    synchTurtleData(turtle);
-});
 
 //Pings all the turtles
 //If turtle doesn't respond by next ping then remove the turtle
@@ -116,11 +103,23 @@ function pingTurtles() {
     setTimeout(pingTurtles, 2000);
 }
 
-pingTurtles();
+/*=========================== WebSocket Connection ===========================*/
 
-//Update the window
-function updateWin(_win) {
-    win = _win;
-}
+//When a websocket connects to the server create a new Turtle object passing in it's
+//corresponding WebSocket
+wss.on('connection', async (ws) => {
+    let turtle = new Turtle(ws);
+    turtles.push(turtle);
+
+    //Display
+    console.log("Turtle connected: " + await turtle.executeAction(Actions.GETLABEL));
+
+    //Update the turtles data
+    await turtle.updateMetaData();
+
+    //Synchs the position and name, if there is not turtle create a new one
+    synchTurtleData(turtle);
+    SaveLoadManager.update();
+});
 
 module.exports = { turtles, updateWin, turtleList };

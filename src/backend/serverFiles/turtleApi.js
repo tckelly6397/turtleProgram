@@ -1,17 +1,14 @@
+/*=========================== Imports ===========================*/
 const server = require("./server.js");
 const fs = require('fs');
-const { Vector3 } = require("three");
 const { ipcMain } = require('electron');
+const SaveLoadManager = require('./SaveLoadManager');
 
+/*=========================== Variables ===========================*/
 let win;
-
 let selectedTurtle;
-let worldData;
 
-//
-//Util Functions
-//
-
+/*=========================== Util Functions ===========================*/
 //Call detect on the turtle and send the data to the frontend
 function detectAll() {
   let jsonData = selectedTurtle.detect();
@@ -35,20 +32,6 @@ function isTurtlesEqual(turtleClass, turtleData) {
   }
 }
 
-ipcMain.on("frontAction", async (event, args) => {
-  await selectedTurtle.executeAction(args);
-
-  //When you move update the turtle position
-  updateTurtleData();
-
-  //On movement detect
-  detectAll();
-});
-
-//
-//World functions
-//
-
 function syncWorld() {
   fs.readFile("./src/backend/serverFiles/worlds/" + selectedTurtle.mapLocation, (err, data) => {
     if(err) {
@@ -66,6 +49,22 @@ function syncWorld() {
     win.webContents.send("backSynchWorldData", newData);
   });
 }
+
+//Update the window
+function updateWin(_win) {
+  win = _win;
+}
+
+/*=========================== Events ===========================*/
+ipcMain.on("frontAction", async (event, args) => {
+  await selectedTurtle.executeAction(args);
+
+  //When you move update the turtle position
+  updateTurtleData();
+
+  //On movement detect
+  detectAll();
+});
 
 //When called return world data
 ipcMain.on("frontSynchWorld", (event, args) => {
@@ -97,16 +96,11 @@ ipcMain.on("frontUpdateWorld", (event, args) => {
   );
 });
 
-
-//
-//Extras
-//
-
 //Print the list of turtles data
 ipcMain.on("frontPrintAllTurtleData", (event, args) => {
 
   server.turtles.forEach(turtle => {
-    console.log(turtle.getStats());
+    console.log(turtle.getTurtleData());
   })
 });
 
@@ -127,10 +121,5 @@ ipcMain.on("frontSelectTurtle", (event, args) => {
     console.log(args.label + ": offline");
   }
 });
-
-//Update the window
-function updateWin(_win) {
-    win = _win;
-}
 
 module.exports = { updateWin };

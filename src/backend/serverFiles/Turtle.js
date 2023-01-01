@@ -1,12 +1,13 @@
 /*
 * Holds data pertaining to a Turtle
+* Turtle code: https://pastebin.com/SYnheFxj
 */
 
-//Turtle code: https://patebin.com/6ZnajFGz
-
+/*=========================== Imports ===========================*/
 const { Vector3 } = require("three");
 const fs = require('fs');
 
+/*=========================== ENUM Actions ===========================*/
 const Actions = {
 	FORWARD: "forward",
 	BACK: "back",
@@ -27,7 +28,9 @@ const Actions = {
     SETLABEL: "setLabel"
 }
 
+/*=========================== Turtle Class ===========================*/
 class Turtle {
+    /*=========================== Variables ===========================*/
     label;
     inventory;
     position;
@@ -39,6 +42,7 @@ class Turtle {
     actionMap;
     mapLocation;
 
+    /*=========================== Constructor ===========================*/
     constructor(ws) {
         this.inventory = [];
         this.position = new Vector3();
@@ -47,6 +51,8 @@ class Turtle {
         this.busy = false;
         this.mapLocation = undefined;
 
+        /*=========================== Action Map ===========================*/
+        //Maps action names to function executions
         this.actionMap = {
             "forward": () => {return this.moveForward();},
             "back": () => {return this.moveBackward();},
@@ -64,16 +70,13 @@ class Turtle {
             "detectForward": async () => {return (await this.execute("turtle.inspect()"));},
             "detectDown": async () => {return (await this.execute("turtle.inspectDown()"));},
             "setLabel": async (name) => {return (await this.execute("os.setComputerLabel(" + "\"" + name + "\"" + ")"));},
-            "stats": async () => {return this.getStats;}
+            "stats": async () => {return this.getTurtleData();}
         }
     }
 
-    //Functions ===
-    //Execute
-    //Move functions
-    //Stats functions
-    //Get Map data
-
+    /*=========================== Executions ===========================*/
+    //Takes in a action name and optional arguments
+    //Executes the action
     async executeAction(action, args) {
         var startTime = performance.now()
 
@@ -83,26 +86,6 @@ class Turtle {
         //console.log(`action ${action} took ${endTime - startTime} milliseconds`)
 
         return data;
-    }
-
-    async updateMetaData() {
-        this.fuel = await this.executeAction(Actions.GETFUEL);
-        this.computerId = await this.executeAction(Actions.COMPUTERID);
-        this.label = await this.executeAction(Actions.GETLABEL);
-
-        if(this.label == undefined) {
-            //Get a random name
-            let names = fs.readFileSync("./src/backend/serverFiles/TurtleData/names.json", {encoding:'utf8', flag:'r'});
-            names = JSON.parse(names);
-            let name = names[Math.ceil(Math.random() * names.length)];
-
-            await this.executeAction(Actions.SETLABEL, name);
-            this.label = await this.executeAction(Actions.GETLABEL);
-        }
-
-        if(this.mapLocation == undefined) {
-            this.mapLocation = this.label + "World.json";
-        }
     }
 
     async turnRight() {
@@ -203,12 +186,28 @@ class Turtle {
         });
     }
 
-    getStats() {
-        return "{label: " + this.label + ", computerId: " + this.computerId + ", Inventory: " + this.inventory +
-        ", position{" + this.position.x + ", " + this.position.y + ", " + this.position.z + "}" +
-        ", rotation: " + this.rotation + ", fuel: " + this.fuel + ", world: " + this.mapLocation + "}";
+    /*=========================== Extra Functions ===========================*/
+    //Updates the turtles meta data
+    async updateMetaData() {
+        this.fuel = await this.executeAction(Actions.GETFUEL);
+        this.computerId = await this.executeAction(Actions.COMPUTERID);
+        this.label = await this.executeAction(Actions.GETLABEL);
+
+        if(this.label == undefined) {
+            //Get a random name
+            let names = fs.readFileSync("./src/backend/serverFiles/TurtleData/names.json", {encoding:'utf8', flag:'r'});
+            names = JSON.parse(names);
+            let name = names[Math.ceil(Math.random() * names.length)];
+
+            await this.executeAction(Actions.SETLABEL, name);
+            this.label = await this.executeAction(Actions.GETLABEL);
+        }
+
+        if(this.mapLocation == undefined) {
+        }
     }
 
+    //Retrieve the turtle data
     getTurtleData() {
         let data = {
             "label": this.label,
@@ -231,32 +230,26 @@ class Turtle {
         let down = await this.executeAction(Actions.DETECTDOWN);
         let forward = await this.executeAction(Actions.DETECTFORWARD);
 
-        let blockU = {
-            "name": (top.callback) ? top.extra.name : "air",
-            "x": this.position.x,
-            "y": this.position.y + 1,
-            "z": this.position.z
-        }
-
-        let blockD = {
-            "name": (down.callback) ? down.extra.name : "air",
-            "x": this.position.x,
-            "y": this.position.y - 1,
-            "z": this.position.z
-        }
-
-        let blockF = {
-            "name": (forward.callback) ? forward.extra.name : "air",
-            "x": this.position.x + Math.round(Math.cos(this.rotation * (Math.PI/180))),
-            "y": this.position.y,
-            "z": this.position.z + Math.round(Math.sin(this.rotation * (Math.PI/180)))
-        }
+        let blockU = this.getBlockData(top, 0, 1, 0);
+        let blockD = this.getBlockData(down, 0, -1, 0);
+        let blockF = this.getBlockData(forward, Math.round(Math.cos(this.rotation * (Math.PI/180))), 0, Math.round(Math.sin(this.rotation * (Math.PI/180))));
 
         blocks.push(blockU);
         blocks.push(blockD);
         blocks.push(blockF);
 
         return JSON.stringify(blocks);
+    }
+
+    //Accept a detection and an offset and return the block data
+    getBlockData(detection, xOff, yOff, zOff) {
+
+        return {
+            "name": (detection.callback) ? detection.extra.name : "air",
+            "x": this.position.x + xOff,
+            "y": this.position.y + yOff,
+            "z": this.position.z + zOff
+        }
     }
 }
 

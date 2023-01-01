@@ -1,17 +1,23 @@
 /*
 * Creates the Electron application and window
 */
+
+/*=========================== Imports ===========================*/
 const { app, BrowserWindow, dialog } = require('electron');
 const path = require("path");
 const turtleApi = require("./serverFiles/turtleApi");
 const server = require("./serverFiles/server");
 
+/*=========================== Variables ===========================*/
 var win;
 
+
+/*=========================== Functions ===========================*/
 function delay(time) {
   return new Promise(resolve => setTimeout(resolve, time));
 }
 
+//Create a window
 function createWindow () {
   win = new BrowserWindow({
     useContentSize: true,
@@ -39,6 +45,7 @@ function createWindow () {
   });
 }
 
+//Function to execute if user tries to exit application
 function windowCloseEvent(e) {
   e.preventDefault()
     dialog.showMessageBox({
@@ -63,6 +70,7 @@ function windowCloseEvent(e) {
     });
 }
 
+/*=========================== Events ===========================*/
 app.whenReady().then(() => {
   createWindow();
 
