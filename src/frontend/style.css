@@ -29,8 +29,6 @@
 #top-area {
     position: relative;
     display: flex;
-    align-items: center;
-    justify-content: center;
 }
 
 .interaction-container {
@@ -72,6 +70,10 @@
 #attack-container Button {
     background-color: rgb(233, 198, 0);
     border-color: rgb(163, 134, 2);
+}
+
+.btn-group {
+    height: 40px;
 }
 
 .dropdown-menu{

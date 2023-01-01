@@ -75,6 +75,7 @@ ipcMain.on("frontSynchWorld", (event, args) => {
 //Update world
 //Args are all the new blocks
 ipcMain.on("frontUpdateWorld", (event, args) => {
+  //Turtle list
   args = JSON.parse(args);
 
   fs.writeFile(
@@ -82,6 +83,12 @@ ipcMain.on("frontUpdateWorld", (event, args) => {
     JSON.stringify(args.blocks),
     (err) => {}
   );
+
+    for(let i = 0; i < args.turtleList.length; i++) {
+      if(isTurtlesEqual(selectedTurtle, args.turtleList[i]) === true) {
+        args.turtleList[i] = selectedTurtle.getTurtleData();
+      }
+    }
 
   fs.writeFile(
     "./src/backend/serverFiles/TurtleData/turtleList.json",

@@ -54,6 +54,7 @@ function removeBlock(block) {
     }
 }
 
+//Clear all the blocks out of the scene
 function clearAllBlocks() {
     for (let [key, value] of objectMap) {
         const index = objects.indexOf(value);
@@ -103,6 +104,8 @@ function updateTurtle(data) {
     positionNew.setFromMatrixPosition( cubeT.matrixWorld );
     controls.target = positionNew;
     rotate(data.rotation);
+
+    document.getElementById("turtle-name").innerText = data.label;
 }
 
 //Get the world and update it
