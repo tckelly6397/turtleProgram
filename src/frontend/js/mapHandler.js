@@ -175,7 +175,7 @@ addEventListener('mousedown', (event) => {
     if(object != undefined) {
         let block = getBlockByObject(object);
         if(block != undefined) {
-            document.getElementById("info-area").innerText = block.name;
+            document.getElementById("block-info-area").innerText = block.name;
         }
 
         //Set target to block on middle click

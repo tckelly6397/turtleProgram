@@ -1,3 +1,17 @@
+body {
+    margin: 0;
+    overflow: hidden;
+}
+
+.full-screen {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background-color: black;
+}
+
 #interaction-buttons {
     display: flex;
     flex-direction: column;
@@ -21,7 +35,7 @@
     background-color: #4D8F5f;
 }
 
-#info-area {
+#block-info-area {
     position: relative;
     color: white;
 }
@@ -34,6 +48,9 @@
 #top-area {
     position: relative;
     display: flex;
+    background-color: #3f3f3fbf;
+
+    padding: 10px;
 }
 
 .interaction-container {
@@ -67,14 +84,14 @@
     border-color: rgb(175, 0, 0);
 }
 
-#move-container Button {
-    background-color: rgb(0, 206, 51);
-    border-color: rgb(0, 133, 22);
-}
-
 #attack-container Button {
     background-color: rgb(233, 198, 0);
     border-color: rgb(163, 134, 2);
+}
+
+#place-container Button {
+    background-color: rgb(0, 206, 51);
+    border-color: rgb(0, 133, 22);
 }
 
 .btn-group {
@@ -84,4 +101,44 @@
 .dropdown-menu{
     height:200px;
     overflow-y:auto;
+}
+
+#main-buttons {
+    display: flex;
+}
+
+/*
+#top-area div {
+    margin-left: 5px;
+    margin-right: 5px;
+}
+*/
+
+#top-area #inventory {
+    margin-left: auto;
+}
+
+.item-row {
+    display: flex;
+}
+
+.item {
+    display: flex;
+
+    color: white;
+    width: 37px;
+    height: 37px;
+    border: #5f5f5f solid 3px;
+    justify-content: center;
+    align-items: center;
+
+    margin: 2px;
+}
+
+.item:hover {
+    cursor: pointer;
+}
+
+.item.selected {
+    border: #d19200 solid 3px;
 }

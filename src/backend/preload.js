@@ -22,7 +22,7 @@ contextBridge.exposeInMainWorld(
     "api", {
         send: (channel, data) => {
             // whitelist channels
-            let validChannels = ["frontAction", "frontSynchWorld", "frontUpdateWorld", "frontPrintAllTurtleData", "frontSelectTurtle"];
+            let validChannels = ["frontAction", "frontUpdateWorld", "frontPrintAllTurtleData", "frontSelectTurtle"];
             if (validChannels.includes(channel)) {
                 ipcRenderer.send(channel, data);
             }

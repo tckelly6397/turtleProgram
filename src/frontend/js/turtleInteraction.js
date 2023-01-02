@@ -6,6 +6,9 @@
 import { scene, turtleObj, controls, camera } from './threeRenderer.js';
 import * as THREE from '../../../build/three.module.js';
 import * as MapHandler from './mapHandler.js';
+//import * as smalltalk from '../../../node_modules/smalltalk';
+
+//const { scene, turtleObj, controls, camera }
 
 /*=========================== Variables ===========================*/
 
@@ -25,8 +28,10 @@ function updateTurtle(turtle) {
     controls.target = positionNew;
     rotate(turtle.rotation);
 
-    console.log(turtle.label);
-    document.getElementById("turtle-name").innerText = turtle.label;
+    console.log(turtle);
+    selectSlot(turtle.selectedSlot);
+    updateInventory(turtle.inventory);
+    document.getElementById("turtle-name").innerText = turtle.label + " " + turtle.fuel;
 }
 
 /*=========================== Events ===========================*/
@@ -81,13 +86,19 @@ for(var j = 0; j < InteractionContainers.length; j++) {
     for (var i = 0; i < InteractionContainers[j].children.length; i++) {
         InteractionContainers[j].children[i].onclick = function () {
             let command = this.getAttribute("data-command");
+            let data = {
+                "action": command,
+                "args": ""
+            }
 
             if(command == "updateWorld") {
                 window.api.send("frontUpdateWorld");
             } else if(command == "printTurtleData") {
                 window.api.send("frontPrintAllTurtleData");
+            } else if(command == "refuel") {
+                window.api.send("frontAction", JSON.stringify(data));
             } else {
-                window.api.send("frontAction", command);
+                window.api.send("frontAction", JSON.stringify(data));
             }
         }
     }
@@ -95,16 +106,58 @@ for(var j = 0; j < InteractionContainers.length; j++) {
 
 document.addEventListener('keydown', function(event) {
     if(event.key == 'w') {
-        window.api.send("frontAction", "forward");
+        window.api.send("frontAction", JSON.stringify({"action": "forward", "args": ""}));
     } else if(event.key == 'a') {
-        window.api.send("frontAction", "turnLeft");
+        window.api.send("frontAction", JSON.stringify({"action": "turnLeft", "args": ""}));
     } else if(event.key == 'd') {
-        window.api.send("frontAction", "turnRight");
+        window.api.send("frontAction", JSON.stringify({"action": "turnRight", "args": ""}));
     } else if(event.key == 's') {
-        window.api.send("frontAction", "back");
+        window.api.send("frontAction", JSON.stringify({"action": "back", "args": ""}));
     } else if(event.key == ' ') {
-        window.api.send("frontAction", "up");
+        window.api.send("frontAction", JSON.stringify({"action": "up", "args": ""}));
     } else if(event.shiftKey) {
-        window.api.send("frontAction", "down");
+        window.api.send("frontAction", JSON.stringify({"action": "down", "args": ""}));
     }
 });
+
+/*=========================== Inventory ===========================*/
+let itemSlots = document.getElementsByClassName("item");
+
+//Removes selected tag from each item
+function clearItemSelected() {
+    Array.from(itemSlots).forEach(item => {
+        item.classList.remove("selected");
+    });
+}
+
+for(let i = 0; i < itemSlots.length; i++) {
+    let item = itemSlots[i];
+
+    item.addEventListener("click", (event) => {
+        let data = {
+            "action": "selectItem",
+            "args": i + 1
+        }
+        window.api.send("frontAction", JSON.stringify(data));
+    });
+}
+
+function selectSlot(slot) {
+    clearItemSelected();
+    itemSlots[slot - 1].classList.add("selected");
+}
+
+function updateInventory(inventory) {
+
+    for(let i = 0; i < inventory.length; i++) {
+        let item = inventory[i];
+
+        if(item != undefined) {
+            itemSlots[i].setAttribute("title", item.label);
+            itemSlots[i].innerText = item.count;
+        } else {
+            itemSlots[i].setAttribute("title", "");
+            itemSlots[i].innerText = "";
+        }
+    }
+}

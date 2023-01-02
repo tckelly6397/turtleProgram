@@ -6,6 +6,7 @@
 /*=========================== Imports ===========================*/
 const { Vector3 } = require("three");
 const fs = require('fs');
+const Item = require("./item.js");
 
 /*=========================== ENUM Actions ===========================*/
 const Actions = {
@@ -25,7 +26,13 @@ const Actions = {
     DETECTFORWARD: "detectForward",
     DETECTDOWN: "detectDown",
     STATS: "stats",
-    SETLABEL: "setLabel"
+    SETLABEL: "setLabel",
+    SELECTITEM: "selectItem",
+    GETITEMDETAIL: "getItemDetail",
+    PLACEUP: "placeUp",
+    PLACEFORWARD: "placeForward",
+    PLACEDOWN: "placeDown",
+    REFUEL: "refuel"
 }
 
 /*=========================== Turtle Class ===========================*/
@@ -41,15 +48,17 @@ class Turtle {
     computerId;
     actionMap;
     mapLocation;
+    selectedSlot;
 
     /*=========================== Constructor ===========================*/
     constructor(ws) {
-        this.inventory = [];
+        this.inventory = new Array(16);
         this.position = new Vector3();
         this.rotation = 0;
         this.ws = ws;
         this.busy = false;
         this.mapLocation = undefined;
+        this.selectedSlot = 0;
 
         /*=========================== Action Map ===========================*/
         //Maps action names to function executions
@@ -70,6 +79,12 @@ class Turtle {
             "detectForward": async () => {return (await this.execute("turtle.inspect()"));},
             "detectDown": async () => {return (await this.execute("turtle.inspectDown()"));},
             "setLabel": async (name) => {return (await this.execute("os.setComputerLabel(" + "\"" + name + "\"" + ")"));},
+            "selectItem": async (slot) => {return this.selectSlot(slot);},
+            "refuel": async (amount) => {return (await this.execute("turtle.refuel(" + amount + ")"));},
+            "getItemDetail": async () => {return (await this.execute("turtle.getItemDetail()")).callback;},
+            "placeDown": async () => {return (await this.execute("turtle.placeDown()")).callback;},
+            "placeForward": async () => {return (await this.execute("turtle.place()")).callback;},
+            "placeUp": async () => {return (await this.execute("turtle.placeUp()")).callback;},
             "stats": async () => {return this.getTurtleData();}
         }
     }
@@ -86,6 +101,16 @@ class Turtle {
         //console.log(`action ${action} took ${endTime - startTime} milliseconds`)
 
         return data;
+    }
+
+    async selectSlot(slot) {
+        let selectSlot = await this.execute("turtle.select(" + slot + ")");
+
+        if(selectSlot != undefined) {
+            this.selectedSlot = slot;
+        }
+
+        return slot;
     }
 
     async turnRight() {
@@ -206,6 +231,34 @@ class Turtle {
         if(this.mapLocation == undefined) {
             this.mapLocation = this.label + "World.json";
         }
+
+        this.updateInventory();
+    }
+
+    async updateInventory() {
+        //Loop through the inventory slots
+        for(let i = 1; i < 17; i++) {
+            await this.executeAction(Actions.SELECTITEM, i);
+            let item = await this.executeAction(Actions.GETITEMDETAIL);
+
+            //If a item is found then add it to the inventory
+            if(item != undefined) {
+                this.inventory[i - 1] = new Item(item.name, item.count);
+            } else {
+                this.inventory[i - 1] = undefined;
+            }
+        }
+    }
+
+    async updateSelectedSlot() {
+        let item = await this.executeAction(Actions.GETITEMDETAIL);
+
+        //If a item is found then add it to the inventory
+        if(item != undefined) {
+            this.inventory[this.selectedSlot - 1] = new Item(item.name, item.count);
+        } else {
+            this.inventory[this.selectedSlot - 1] = undefined;
+        }
     }
 
     //Retrieve the turtle data
@@ -218,7 +271,9 @@ class Turtle {
             "x": this.position.x,
             "y": this.position.y,
             "z": this.position.z,
-            "mapLocation": this.mapLocation
+            "mapLocation": this.mapLocation,
+            "inventory": this.inventory,
+            "selectedSlot": this.selectedSlot
         }
 
         return data;
@@ -249,7 +304,8 @@ class Turtle {
             "name": (detection.callback) ? detection.extra.name : "air",
             "x": this.position.x + xOff,
             "y": this.position.y + yOff,
-            "z": this.position.z + zOff
+            "z": this.position.z + zOff,
+            "extra": (detection.callback) ? detection.extra : "empty"
         }
     }
 }

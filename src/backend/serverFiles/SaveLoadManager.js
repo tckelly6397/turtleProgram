@@ -28,8 +28,6 @@ function initialize(_turtleList) {
 
 //On new turtle update the turtle
 function update(turtleData) {
-    turtleList.push(turtleData);
-
     //Updates the local world map
     loadLocalWorld(turtleData);
 }
@@ -93,7 +91,9 @@ function addBlock(worldName, block) {
         removeBlock(worldName, block.x, block.y, block.z);
     }
 
-    WorldData.push(block);
+    if(oldBlock == -1) {
+        WorldData.push(block);
+    }
 }
 
 //Takes an x and y coordinate and if there is a block in the world data with those coordinates
@@ -179,6 +179,7 @@ function saveWorlds() {
 //Save a turtle
 function saveTurtle(Turtle) {
     saveWorld(Turtle.mapLocation, LocalWorldMap.get(Turtle.mapLocation));
+    updateTurtle(Turtle);
     updateTurtleList();
 }
 

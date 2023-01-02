@@ -2,6 +2,7 @@
 const server = require("./server.js");
 const { ipcMain } = require('electron');
 const SaveLoadManager = require('./SaveLoadManager');
+const Turtle = require('./Turtle.js');
 
 /*=========================== Variables ===========================*/
 let win;
@@ -47,22 +48,21 @@ function updateWin(_win) {
 
 /*=========================== Events ===========================*/
 ipcMain.on("frontAction", async (event, args) => {
-  await selectedTurtle.executeAction(args);
+  let data = JSON.parse(args);
+  await selectedTurtle.executeAction(data.action, data.args);
 
   //When you move update the turtle position send to front end the new data
+  selectedTurtle.fuel = await selectedTurtle.executeAction(Turtle.Actions.GETFUEL);
+  await selectedTurtle.updateSelectedSlot();
   win.webContents.send("updateTurtleData", JSON.stringify(selectedTurtle.getTurtleData()));
 
   //On movement detect
   detectAll();
 });
 
-//When called return world data
-ipcMain.on("frontSynchWorld", (event, args) => {
-  //syncWorld();
-});
-
 //Save selected turtle data
 ipcMain.on("frontUpdateWorld", (event, args) => {
+  console.log(selectedTurtle.getTurtleData());
   SaveLoadManager.saveTurtle(selectedTurtle);
 });
 

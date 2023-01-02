@@ -11,13 +11,9 @@ https://pastebin.com/SYnheFxj
 
 ## ToDo
 ### Basics
--Make the interaction between front-end and back-end more understandable\
--Clean up front-end code\
--More comments\
 -Inventory system\
 -Better controls\
--Error handling\
--Move save load to back end
+-Error handling
 
 ### Advanced
 -Replication\

@@ -54,17 +54,7 @@ function createNewTurtle(turtle) {
     turtleList.push(turtle.getTurtleData());
     win.webContents.send("backSendTurtleList", turtleList);
 
-    //Write to the turtleList file
-    fs.writeFile(
-        "./src/backend/serverFiles/TurtleData/turtleList.json",
-        JSON.stringify(turtleList),
-        (err) => {
-            if(err) throw err;
-            else {
-                SaveLoadManager.update(turtle.getTurtleData());
-            }
-        }
-    );
+    SaveLoadManager.update(turtle.getTurtleData());
 }
 
 //Look for the turtle in the list of turtles
@@ -103,7 +93,8 @@ function pingTurtles() {
             console.log("Turtle disconnected: " + turtle.label);
 
             //Save the turtle
-            SaveLoadManager.saveTurtle(turtle);
+            //SaveLoadManager.saveTurtle(turtle);
+
             //Remove the turtle
             const index = turtles.indexOf(turtle);
             if (index > -1) {
