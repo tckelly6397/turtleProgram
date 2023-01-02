@@ -21,7 +21,6 @@ console.log(`Listening at ${port}...`);
 
 //Update local turtleList
 synchTurtleList();
-SaveLoadManager.initialize();
 
 //Begin pinging turtles
 pingTurtles();
@@ -35,7 +34,12 @@ function updateWin(_win) {
 //Gets data from turtleList.json and applies it to the local turtleList
 function synchTurtleList() {
     fs.readFile("./src/backend/serverFiles/TurtleData/turtleList.json", (err, data) => {
-        turtleList = JSON.parse(data);
+        if(data == undefined) {
+            turtleList = [];
+        } else {
+            turtleList = JSON.parse(data);
+        }
+        SaveLoadManager.initialize(turtleList);
 
         //Send the turtle list to the front end giving time for front end to load
         setTimeout(() => {win.webContents.send("backSendTurtleList", turtleList);}, 1500);
@@ -48,12 +52,18 @@ function createNewTurtle(turtle) {
 
     //Add it to the list
     turtleList.push(turtle.getTurtleData());
+    win.webContents.send("backSendTurtleList", turtleList);
 
     //Write to the turtleList file
-    fs.writeFileSync(
+    fs.writeFile(
         "./src/backend/serverFiles/TurtleData/turtleList.json",
         JSON.stringify(turtleList),
-        (err) => {}
+        (err) => {
+            if(err) throw err;
+            else {
+                SaveLoadManager.update(turtle.getTurtleData());
+            }
+        }
     );
 }
 
@@ -119,7 +129,6 @@ wss.on('connection', async (ws) => {
 
     //Synchs the position and name, if there is not turtle create a new one
     synchTurtleData(turtle);
-    SaveLoadManager.update();
 });
 
 module.exports = { turtles, updateWin, turtleList };

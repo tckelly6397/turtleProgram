@@ -14,6 +14,9 @@ function detectAll() {
   let jsonData = selectedTurtle.detect();
   jsonData.then((data) => {
     win.webContents.send("detected", data);
+
+    //Send to the save load manager
+    SaveLoadManager.updateLocalWorld(selectedTurtle, data);
   });
 }
 
@@ -32,22 +35,16 @@ function isTurtlesEqual(turtleClass, turtleData) {
   }
 }
 
+//Get the turtle and world data and send to front end
 function syncWorld() {
-  fs.readFile("./src/backend/serverFiles/worlds/" + selectedTurtle.mapLocation, (err, data) => {
-    if(err) {
-      console.log("No world file");
-      win.webContents.send("backSynchWorldData");
-      return;
-    }
-    data = JSON.parse(data);
+  let data = SaveLoadManager.getWorldData(selectedTurtle.mapLocation);
 
-    let newData = {
-      "blocks": data,
-      "turtle": selectedTurtle.getTurtleData()
-    }
+  let newData = {
+    "blocks": data,
+    "turtle": selectedTurtle.getTurtleData()
+  }
 
-    win.webContents.send("backSynchWorldData", newData);
-  });
+  win.webContents.send("backSynchWorldData", newData);
 }
 
 //Update the window
@@ -68,37 +65,16 @@ ipcMain.on("frontAction", async (event, args) => {
 
 //When called return world data
 ipcMain.on("frontSynchWorld", (event, args) => {
-  syncWorld();
+  //syncWorld();
 });
 
-//Update world
-//Args are all the new blocks
+//Save selected turtle data
 ipcMain.on("frontUpdateWorld", (event, args) => {
-  //Turtle list
-  args = JSON.parse(args);
-
-  fs.writeFile(
-    "./src/backend/serverFiles/worlds/" + selectedTurtle.mapLocation,
-    JSON.stringify(args.blocks),
-    (err) => {}
-  );
-
-    for(let i = 0; i < args.turtleList.length; i++) {
-      if(isTurtlesEqual(selectedTurtle, args.turtleList[i]) === true) {
-        args.turtleList[i] = selectedTurtle.getTurtleData();
-      }
-    }
-
-  fs.writeFile(
-    "./src/backend/serverFiles/TurtleData/turtleList.json",
-    JSON.stringify(args.turtleList),
-    (err) => {}
-  );
+  SaveLoadManager.saveTurtle(selectedTurtle);
 });
 
 //Print the list of turtles data
 ipcMain.on("frontPrintAllTurtleData", (event, args) => {
-
   server.turtles.forEach(turtle => {
     console.log(turtle.getTurtleData());
   })

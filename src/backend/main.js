@@ -7,6 +7,7 @@ const { app, BrowserWindow, dialog } = require('electron');
 const path = require("path");
 const turtleApi = require("./serverFiles/turtleApi");
 const server = require("./serverFiles/server");
+const SaveLoadManager = require("./serverFiles/SaveLoadManager.js");
 
 /*=========================== Variables ===========================*/
 var win;
@@ -61,7 +62,8 @@ function windowCloseEvent(e) {
         app.quit()
       } else if (response == 1) {
         //Save
-        win.webContents.send("retrieveAndUpdateWorldData");
+        //win.webContents.send("retrieveAndUpdateWorldData");
+        SaveLoadManager.saveWorlds();
 
         await delay(500);
         win.destroy();

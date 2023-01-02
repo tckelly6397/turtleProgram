@@ -49,7 +49,7 @@ let loader = new GLTFLoader();
 loader.load('./models/untitled.glb', function(gltf) {
     turtleObj = gltf.scene.children[0];
     turtleObj.scale.set(2.5, 2.5, 2.5);
-    turtleObj.add(gltf.scene);
+    scene.add(gltf.scene);
 
     turtleObj.position.set(10, 5, 2);
 });

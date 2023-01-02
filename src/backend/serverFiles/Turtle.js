@@ -204,6 +204,7 @@ class Turtle {
         }
 
         if(this.mapLocation == undefined) {
+            this.mapLocation = this.label + "World.json";
         }
     }
 
