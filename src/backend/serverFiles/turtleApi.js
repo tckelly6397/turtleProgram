@@ -1,6 +1,5 @@
 /*=========================== Imports ===========================*/
 const server = require("./server.js");
-const fs = require('fs');
 const { ipcMain } = require('electron');
 const SaveLoadManager = require('./SaveLoadManager');
 
@@ -18,12 +17,6 @@ function detectAll() {
     //Send to the save load manager
     SaveLoadManager.updateLocalWorld(selectedTurtle, data);
   });
-}
-
-function updateTurtleData() {
-  let data = selectedTurtle.getTurtleData();
-
-  win.webContents.send("updateTurtleData", JSON.stringify(data));
 }
 
 //Takes in a turtle class and a turtle json and checks if equal
@@ -56,8 +49,8 @@ function updateWin(_win) {
 ipcMain.on("frontAction", async (event, args) => {
   await selectedTurtle.executeAction(args);
 
-  //When you move update the turtle position
-  updateTurtleData();
+  //When you move update the turtle position send to front end the new data
+  win.webContents.send("updateTurtleData", JSON.stringify(selectedTurtle.getTurtleData()));
 
   //On movement detect
   detectAll();

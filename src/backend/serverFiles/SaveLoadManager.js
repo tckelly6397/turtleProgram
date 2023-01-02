@@ -61,22 +61,51 @@ function getTurtleIndex(Turtle) {
     }
 }
 
+//Check if two block positions are equal
+function equalBlock(block, x, y, z) {
+    if(block.x == x && block.y == y && block.z == z) {
+        return true;
+    }
+
+    return false;
+}
+
+//Return a block if found
+//Return -1 if not
+function getBlockByPosition(WorldData, x, y, z) {
+    for(let i = 0; i < WorldData.length; i++) {
+        let block = WorldData[i];
+
+        if(equalBlock(block, x, y, z)) {
+            return block;
+        }
+    }
+
+    return -1;
+}
+
 //Adds a block to the list
 function addBlock(worldName, block) {
-    console.log(block);
-    LocalWorldMap.get(worldName).push(block);
+    let WorldData = LocalWorldMap.get(worldName);
+    let oldBlock = getBlockByPosition(WorldData, block.x, block.y, block.z);
+
+    if(oldBlock != -1 && oldBlock.name != block.name) {
+        removeBlock(worldName, block.x, block.y, block.z);
+    }
+
+    WorldData.push(block);
 }
 
 //Takes an x and y coordinate and if there is a block in the world data with those coordinates
 //then remove t
-function removeBlock(worldName, x, y) {
+function removeBlock(worldName, x, y, z) {
     let WorldData = LocalWorldMap.get(worldName);
 
     for(let i = 0; i < WorldData.length; i++) {
         let block = WorldData[i];
 
         //If they're equal then remove the block
-        if(x == block.x && y == block.y) {
+        if(equalBlock(block, x, y, z)) {
             WorldData.splice(i, 1);
         }
     }
@@ -90,7 +119,6 @@ function loadLocalWorld(Turtle) {
     if(LocalWorldMap.get(worldName) == undefined) {
         fs.readFile("./src/backend/serverFiles/worlds/" + worldName, function read(err, data) {
             if(err) {
-                console.log("no world");
                 LocalWorldMap.set(worldName, []);
                 return;
             }
@@ -112,7 +140,7 @@ function updateLocalWorld(Turtle, blocks) {
 
         //If the block is air try and remove it, else add it to the list
         if(block.name == 'air') {
-            removeBlock(worldName, block.x, block.y);
+            removeBlock(worldName, block.x, block.y, block.z);
         } else {
             addBlock(worldName, block);
         }
@@ -131,6 +159,9 @@ function updateTurtle(Turtle) {
 
 //Takes the local data and stores it in the correct map location
 function saveWorld(worldName, worldData) {
+    if(worldData.length == 0) {
+        return;
+    }
     fs.writeFile("./src/backend/serverFiles/worlds/" + worldName, JSON.stringify(worldData), (err) => {
         return null;
     });
@@ -157,8 +188,6 @@ function getWorldData(worldName) {
 }
 
 module.exports = { initialize, update, updateTurtle, updateLocalWorld, saveWorlds, saveTurtle, getWorldData };
-
-//Change how the front end stores blocks and three js objects, maybe store it all in one object {"BlockData": {"Minecraft:Dirt"}, "ObjectData":{"Objectstuff"}}
 
 //Usage
 //initialize(list): read in the turtle list and apply it to the local list as well as loading in the local world map data

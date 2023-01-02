@@ -26,6 +26,11 @@
     color: white;
 }
 
+#turtle-name {
+    position: relative;
+    color: white;
+}
+
 #top-area {
     position: relative;
     display: flex;

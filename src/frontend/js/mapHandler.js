@@ -1,13 +1,45 @@
+/*=========================== Imports ===========================*/
 import * as THREE from '../../../build/three.module.js';
-import { scene, camera } from './threeRenderer.js';
+import { scene, camera, controls } from './threeRenderer.js';
 
+/*=========================== Variables ===========================*/
 let objects = [];
 const colorMap = new Map();
-let objectMap = new Map();
+
+/*=========================== Functions ===========================*/
+//Get the block form a object
+//If nothing found return -1
+function getBlockByObject(obj) {
+
+    for(let i = 0; i < objects.length; i++) {
+        let data = objects[i];
+
+        if(data.object == obj) {
+            return data.block;
+        }
+    }
+
+    return -1;
+}
+
+//Get the block form a object
+//If nothing found return -1
+function getDataByPosition(x, y, z) {
+
+    for(let i = 0; i < objects.length; i++) {
+        let data = objects[i];
+
+        if(equalBlock(data.block, x, y, z)) {
+            return data;
+        }
+    }
+
+    return -1;
+}
 
 //Check if two block positions are equal
-function equalBlock(block1, block2) {
-    if(block1.x == block2.x && block1.y == block2.y && block1.z == block2.z) {
+function equalBlock(block, x, y, z) {
+    if(block.x == x && block.y == y && block.z == z) {
         return true;
     }
 
@@ -15,49 +47,51 @@ function equalBlock(block1, block2) {
 }
 
 //Add a block/update a block by position
-function addBlock(block) {
-    for (let [key, value] of objectMap) {
-        if(equalBlock(block, key) == true) {
-            if(block.name != key.name) {
-                const index = objects.indexOf(value);
-                if (index > -1) {
-                    objects.splice(index, 1);
-                }
-                scene.remove(value);
-                break;
-            }
-            return;
-        }
+export function addBlock(block) {
+    //Get the current blocks position
+    let mapData = getDataByPosition(block.x, block.y, block.z);
+
+    //If there is a block there and they're different then remove the current one and add a new one
+    if(mapData != -1 && mapData.block.name != block.name) {
+        removeData(mapData);
+
+        addObject(block);
     }
 
-    addObject(block);
+    //If there isn't a block there then add it
+    if(mapData == -1) {
+        addObject(block);
+    }
+}
+
+//Remove a data from the list
+function removeData(data) {
+    const index = objects.indexOf(data);
+    if (index > -1) {
+        objects.splice(index, 1);
+    }
+
+    scene.remove(data.object);
 }
 
 //Remove a block based on its position
-function removeBlock(block) {
-    for (let [key, value] of objectMap) {
-        if(equalBlock(block, key) == true) {
-            const index = objects.indexOf(value);
-            if (index > -1) {
-                objects.splice(index, 1);
-            }
-            objectMap.delete(key);
-            scene.remove(value);
-            break;
-        }
+export function removeBlock(block) {
+    //Get the current blocks position
+    let mapData = getDataByPosition(block.x, block.y, block.z);
+
+    //If there is a block in the position then remove it
+    if(mapData != -1) {
+        removeData(mapData);
     }
 }
 
 //Clear all the blocks out of the scene
 function clearAllBlocks() {
-    for (let [key, value] of objectMap) {
-        const index = objects.indexOf(value);
-        if (index > -1) {
-            objects.splice(index, 1);
-        }
-        objectMap.delete(key);
-        scene.remove(value);
+    for(let i = 0; i < objects.length; i++) {
+        let data = objects[i];
+        scene.remove(data.object);
     }
+    objects = [];
 }
 
 //Add a THREE JS object
@@ -83,18 +117,20 @@ function addObject(block) {
     //Set the position of the mesh
     cube.position.set(block.x * 5, block.y * 5, block.z * 5);
 
-    //Add the cube to the scene
-    objects.push( cube );
-    objectMap.set(block, cube);
+    //Add the object
+    let data = {
+        "block": block,
+        "object": cube
+    }
+    objects.push(data);
     scene.add( cube );
 }
 
 //Get the world and update it
 //Parameter is the turtle
-function updateWorld(turtle, initialWorld) {
-    updateTurtle(turtle);
-
-    objects = [];
+export function updateWorld(turtle, initialWorld) {
+    //Remove all objects
+    clearAllBlocks();
 
     for(let i = 0; i < initialWorld.length; i++) {
         let block = initialWorld[i];
@@ -103,23 +139,8 @@ function updateWorld(turtle, initialWorld) {
     }
 }
 
-function getUpdateWorldData() {
-    let worldData = [];
-    for (let [key, value] of objectMap) {
-        console.log(key);
-        worldData.push(key);
-    }
-
-    let args = {
-        "blocks": worldData,
-        "turtleList": turtleList
-    }
-
-    window.api.send("frontUpdateWorld", JSON.stringify(args));
-}
-
-
-
+/*=========================== Events ===========================*/
+//Side stuff
 function getIntersection(event) {
     var mouse = new THREE.Vector2();
     mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
@@ -152,21 +173,18 @@ addEventListener('mousedown', (event) => {
     let object = getIntersection(event);
 
     if(object != undefined) {
-        const inverse = new Map();
-        objectMap.forEach((value, key) => inverse.set(value, key));
-
-        let block = inverse.get(object);
+        let block = getBlockByObject(object);
         if(block != undefined) {
             document.getElementById("info-area").innerText = block.name;
         }
 
-        //Set target to block
-        /*
-        scene.updateMatrixWorld(true);
-        var position = new THREE.Vector3();
-        position.setFromMatrixPosition( object.matrixWorld );
+        //Set target to block on middle click
+        if(event.button == 1) {
+            scene.updateMatrixWorld(true);
+            var position = new THREE.Vector3();
+            position.setFromMatrixPosition( object.matrixWorld );
 
-        controls.target = position;
-        */
+            controls.target = position;
+        }
     }
 });

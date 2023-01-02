@@ -102,6 +102,8 @@ function pingTurtles() {
         turtle.executeAction(Actions.GETLABEL).catch(e => {
             console.log("Turtle disconnected: " + turtle.label);
 
+            //Save the turtle
+            SaveLoadManager.saveTurtle(turtle);
             //Remove the turtle
             const index = turtles.indexOf(turtle);
             if (index > -1) {
