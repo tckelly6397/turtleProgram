@@ -76,42 +76,42 @@ class Turtle {
         /*=========================== Action Map ===========================*/
         //Maps action names to function executions
         this.actionMap = {
-            "forward": () => {return this.moveForward();},
-            "back": () => {return this.moveBackward();},
-            "up": () => {return this.moveUp();},
-            "down": () => {return this.moveDown();},
-            "turnRight": () => {return this.turnRight();},
-            "turnLeft": () => {return this.turnLeft();},
-            "digForward": async () => {return (await this.execute("turtle.dig()")).callback;},
-            "digUp": async () => {return (await this.execute("turtle.digUp()")).callback;},
-            "digDown": async () => {return (await this.execute("turtle.digDown()")).callback;},
-            "getLabel": async () => {return (await this.execute("os.getComputerLabel()")).callback;},
-            "getFuel": async () => {return (await this.execute("turtle.getFuelLevel()")).callback;},
-            "getComputerId": async () => {return (await this.execute("os.getComputerID()")).callback;},
-            "detectUp": async () => {return (await this.execute("turtle.inspectUp()"));},
-            "detectForward": async () => {return (await this.execute("turtle.inspect()"));},
-            "detectDown": async () => {return (await this.execute("turtle.inspectDown()"));},
-            "setLabel": async (name) => {return (await this.execute("os.setComputerLabel(" + "\"" + name + "\"" + ")"));},
-            "selectItem": async (slot) => {return this.selectSlot(slot);},
-            "refuel": async (amount) => {return (await this.execute("turtle.refuel(" + amount + ")"));},
-            "getItemDetail": async () => {return (await this.execute("turtle.getItemDetail()")).callback;},
-            "placeDown": async (name) => {return this.placeDown(name);},
-            "placeForward": async (name) => {return await this.place(name);},
-            "placeUp": async (name) => {return this.placeUp(name);},
-            "stats": async () => {return this.getTurtleData();},
-            "attackForward": async () => {return (await this.execute("turtle.attack()"));},
-            "attackUp": async () => {return (await this.execute("turtle.attackUp()"));},
-            "attackDown": async () => {return (await this.execute("turtle.attackDown()"));},
-            "equipLeft": async () => {return (await this.execute("turtle.equipLeft()"));},
-            "equipRight": async () => {return (await this.execute("turtle.equipRight()"));},
-            "suckDown": async () => {return (await this.execute("turtle.suckDown()"));},
-            "suckForward": async () => {return (await this.execute("turtle.suck()"));},
-            "suckUp": async () => {return (await this.execute("turtle.suckUp()"));},
-            "dropDown": async () => {return (await this.execute("turtle.dropDown()"));},
-            "dropForward": async () => {return (await this.execute("turtle.drop()"));},
-            "dropUp": async () => {return (await this.execute("turtle.dropUp()"));},
-            "transferTo": async (args) => {return (await this.execute("turtle.transferTo(" + args.slot + ", " + args.amount + ")"));},
-            "craft": async (args) => {return (await this.execute("turtle.craft(" + args.name + ", " + args.amount + ")"));}
+            [Actions.FORWARD]: () => {return this.moveForward();},
+            [Actions.BACK]: () => {return this.moveBackward();},
+            [Actions.UP]: () => {return this.moveUp();},
+            [Actions.DOWN]: () => {return this.moveDown();},
+            [Actions.TURNRIGHT]: () => {return this.turnRight();},
+            [Actions.TURNLEFT]: () => {return this.turnLeft();},
+            [Actions.DIGFORWARD]: async () => {return (await this.execute("turtle.dig()")).callback;},
+            [Actions.DIGUP]: async () => {return (await this.execute("turtle.digUp()")).callback;},
+            [Actions.DIGDOWN]: async () => {return (await this.execute("turtle.digDown()")).callback;},
+            [Actions.GETLABEL]: async () => {return (await this.execute("os.getComputerLabel()")).callback;},
+            [Actions.GETFUEL]: async () => {return (await this.execute("turtle.getFuelLevel()")).callback;},
+            [Actions.COMPUTERID]: async () => {return (await this.execute("os.getComputerID()")).callback;},
+            [Actions.DETECTUP]: async () => {return (await this.execute("turtle.inspectUp()"));},
+            [Actions.DETECTFORWARD]: async () => {return (await this.execute("turtle.inspect()"));},
+            [Actions.DETECTDOWN]: async () => {return (await this.execute("turtle.inspectDown()"));},
+            [Actions.SETLABEL]: async (name) => {return (await this.execute("os.setComputerLabel(" + "\"" + name + "\"" + ")"));},
+            [Actions.SELECTITEM]: async (slot) => {return this.selectSlot(slot);},
+            [Actions.REFUEL]: async (amount) => {return (await this.execute("turtle.refuel(" + amount + ")"));},
+            [Actions.GETITEMDETAIL]: async () => {return (await this.execute("turtle.getItemDetail()")).callback;},
+            [Actions.PLACEDOWN]: async (name) => {return this.placeDown(name);},
+            [Actions.PLACEFORWARD]: async (name) => {return await this.place(name);},
+            [Actions.PLACEUP]: async (name) => {return this.placeUp(name);},
+            [Actions.STATS]: async () => {return this.getTurtleData();},
+            [Actions.ATTACKFORWARD]: async () => {return (await this.execute("turtle.attack()"));},
+            [Actions.ATTACKUP]: async () => {return (await this.execute("turtle.attackUp()"));},
+            [Actions.ATTACKDOWN]: async () => {return (await this.execute("turtle.attackDown()"));},
+            [Actions.EQUIPLEFT]: async () => {return (await this.execute("turtle.equipLeft()"));},
+            [Actions.EQUIPRIGHT]: async () => {return (await this.execute("turtle.equipRight()"));},
+            [Actions.SUCKDOWN]: async () => {return await this.suck("Down");},
+            [Actions.SUCKFORWARD]: async () => {return await this.suck("");},
+            [Actions.SUCKUP]: async () => {return await this.suck("Up");},
+            [Actions.DROPDOWN]: async () => {return await this.drop("Down");},
+            [Actions.DROPFORWARD]: async () => {return await this.drop("");},
+            [Actions.DROPUP]: async () => {return await this.drop("Up");},
+            [Actions.TRANSFERTO]: async (args) => {return (await this.execute("turtle.transferTo(" + args.slot + ", " + args.amount + ")"));},
+            [Actions.CRAFT]: async (args) => {return (await this.execute("turtle.craft(" + args.name + ", " + args.amount + ")"));}
         }
     }
 
@@ -125,6 +125,26 @@ class Turtle {
 
         var endTime = performance.now();
         //console.log(`action ${action} took ${endTime - startTime} milliseconds`)
+
+        return data;
+    }
+
+    async drop(direction) {
+        let data = await (await this.execute("turtle.drop" + direction + "()")).callback;
+
+        if(data == true) {
+            await this.updateSelectedSlot();
+        }
+
+        return data;
+    }
+
+    async suck(direction) {
+        let data = await (await this.execute("turtle.suck" + direction + "()")).callback;
+
+        if(data == true) {
+            await this.updateSelectedSlot();
+        }
 
         return data;
     }

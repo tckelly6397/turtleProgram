@@ -11,8 +11,6 @@ https://pastebin.com/SYnheFxj
 
 ## ToDo
 ### Basics
--Inventory system\
--Better controls\
 -Error handling
 
 ### Advanced
@@ -20,6 +18,10 @@ https://pastebin.com/SYnheFxj
 -Crafting\
 -Mining AI\
 -Hive AI
+
+## AI Idea
+This is crazy but heres the plan
+https://docs.google.com/document/d/1a4ert9upmV6r99dBzyar_n_ZdZ_TYz9vZFOH0HqIWp4/edit?usp=sharing
 
 ### Extra
 -Textures\

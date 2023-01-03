@@ -177,6 +177,10 @@ function saveWorlds() {
 }
 
 //Save a turtle
+//Updates the turtle as well as the turtle map
+/*
+* Very useful for saving any turtle
+*/
 function saveTurtle(Turtle) {
     saveWorld(Turtle.mapLocation, LocalWorldMap.get(Turtle.mapLocation));
     updateTurtle(Turtle);

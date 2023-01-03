@@ -61,12 +61,28 @@
                 </div>
             </div>
 
-            <div class="btn-group">
-                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  Turtles
-                </button>
-                <div class="dropdown-menu" id="turtle-list">
+            <div id="dropdown-lists">
+                <div class="btn-group">
+                    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Turtles
+                    </button>
+                    <div class="dropdown-menu" id="turtle-list">
 
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    States
+                    </button>
+                    <div class="dropdown-menu" id="state-list">
+                        <a class="dropdown-item" onclick='window.api.send("frontState", JSON.stringify({"state": "suck", "args": "Forward"}));'>Suck - Forward</a>
+                        <a class="dropdown-item" onclick='window.api.send("frontState", JSON.stringify({"state": "suck", "args": "Up"}));'>Suck - Up</a>
+                        <a class="dropdown-item" onclick='window.api.send("frontState", JSON.stringify({"state": "suck", "args": "Down"}));'>Suck - Down</a>
+                        <a class="dropdown-item" onclick='window.api.send("frontState", JSON.stringify({"state": "drop", "args": "Forward"}));'>Drop - Forward</a>
+                        <a class="dropdown-item" onclick='window.api.send("frontState", JSON.stringify({"state": "drop", "args": "Up"}));'>Drop - Up</a>
+                        <a class="dropdown-item" onclick='window.api.send("frontState", JSON.stringify({"state": "drop", "args": "Down"}));'>Drop - Down</a>
+                    </div>
                 </div>
             </div>
 

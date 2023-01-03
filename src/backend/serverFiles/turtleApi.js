@@ -4,6 +4,8 @@ const { ipcMain } = require('electron');
 const SaveLoadManager = require('./SaveLoadManager');
 const Turtle = require('./Turtle.js');
 const prompt = require('electron-prompt');
+const Suck = require('./states/Suck.js');
+const Drop = require('./states/Drop.js');
 
 /*=========================== Variables ===========================*/
 let win;
@@ -11,13 +13,13 @@ let selectedTurtle;
 
 /*=========================== Util Functions ===========================*/
 //Call detect on the turtle and send the data to the frontend
-function detectAll() {
-  let jsonData = selectedTurtle.detect();
+function detectAll(Turtle) {
+  let jsonData = Turtle.detect();
   jsonData.then((data) => {
     win.webContents.send("detected", data);
 
     //Send to the save load manager
-    SaveLoadManager.updateLocalWorld(selectedTurtle, data);
+    SaveLoadManager.updateLocalWorld(Turtle, data);
   });
 }
 
@@ -78,6 +80,7 @@ async function placeAction(action) {
   .catch(console.error);
 }
 
+//Updates the turtle data as well as sends the turtle data to the front end
 async function updateData() {
   //Update the slot
   await selectedTurtle.updateSelectedSlot();
@@ -85,7 +88,7 @@ async function updateData() {
   win.webContents.send("updateTurtleData", JSON.stringify(selectedTurtle.getTurtleData()));
 
   //On movement detect
-  detectAll();
+  detectAll(selectedTurtle);
 }
 
 /*=========================== Events ===========================*/
@@ -132,6 +135,27 @@ ipcMain.on("frontSelectTurtle", (event, args) => {
   if(flag === false) {
     console.log(args.label + ": offline");
   }
+});
+
+//Activate state
+ipcMain.on("frontState", async (event, args) => {
+  let data = JSON.parse(args);
+  let state = data.state;
+  let argument = data.args;
+
+  var startTime = performance.now()
+
+  if(state == 'suck') {
+    await Suck.SuckAll(selectedTurtle, argument);
+  } else if(state == 'drop') {
+    //await Drop.DropAllFilter(selectedTurtle, argument, ["minecraft:dirt", "minecraft:stone"]); //["minecraft:dirt"]
+    await Drop.DropAll(selectedTurtle, argument);
+  }
+
+  var endTime = performance.now();
+  console.log(`state ${state} took ${endTime - startTime} milliseconds`)
+
+  win.webContents.send("updateTurtleData", JSON.stringify(selectedTurtle.getTurtleData()));
 });
 
 module.exports = { updateWin };

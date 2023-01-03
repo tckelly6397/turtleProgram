@@ -144,6 +144,7 @@ function selectSlot(slot) {
     itemSlots[slot - 1].classList.add("selected");
 }
 
+//Updates the display inventory given a list of items
 function updateInventory(inventory) {
 
     for(let i = 0; i < inventory.length; i++) {

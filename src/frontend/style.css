@@ -168,3 +168,14 @@ body {
 .item.selected {
     border: #d19200 solid 3px;
 }
+
+#dropdown-lists {
+    display: flex;
+    flex-direction: column;
+}
+
+.btn-group {
+    flex-direction: column;
+
+    margin-bottom: 8px;
+}
