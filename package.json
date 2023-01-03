@@ -23,12 +23,15 @@
   "homepage": "https://github.com/tckelly6397/turtleProgram#readme",
   "dependencies": {
     "electron": "^22.0.0",
+    "electron-prompt": "^1.7.0",
     "electron-reload": "^2.0.0-alpha.1",
     "path": "^0.12.7",
     "prompt-sync": "^4.2.0",
     "react": "^18.2.0",
     "smalltalk": "^4.1.1",
     "three": "^0.148.0",
+    "three-gltf-loader": "^1.111.0",
+    "three-orbitcontrols": "^2.110.3",
     "ws": "^8.11.0"
   },
   "build": {

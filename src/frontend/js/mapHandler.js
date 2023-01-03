@@ -1,6 +1,6 @@
 /*=========================== Imports ===========================*/
-import * as THREE from '../../../build/three.module.js';
 import { scene, camera, controls } from './threeRenderer.js';
+import * as THREE from '../../../build/three.module.js';
 
 /*=========================== Variables ===========================*/
 let objects = [];
@@ -175,7 +175,7 @@ addEventListener('mousedown', (event) => {
     if(object != undefined) {
         let block = getBlockByObject(object);
         if(block != undefined) {
-            document.getElementById("block-info-area").innerText = block.name;
+            document.getElementById("block-info-area").innerText = "Block: " + block.name;
         }
 
         //Set target to block on middle click

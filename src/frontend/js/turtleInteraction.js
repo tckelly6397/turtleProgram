@@ -6,9 +6,6 @@
 import { scene, turtleObj, controls, camera } from './threeRenderer.js';
 import * as THREE from '../../../build/three.module.js';
 import * as MapHandler from './mapHandler.js';
-//import * as smalltalk from '../../../node_modules/smalltalk';
-
-//const { scene, turtleObj, controls, camera }
 
 /*=========================== Variables ===========================*/
 
@@ -31,7 +28,7 @@ function updateTurtle(turtle) {
     console.log(turtle);
     selectSlot(turtle.selectedSlot);
     updateInventory(turtle.inventory);
-    document.getElementById("turtle-name").innerText = turtle.label + " " + turtle.fuel;
+    document.getElementById("turtle-name").innerText = "Turtle: " + turtle.label + " " + turtle.fuel;
 }
 
 /*=========================== Events ===========================*/
@@ -88,7 +85,7 @@ for(var j = 0; j < InteractionContainers.length; j++) {
             let command = this.getAttribute("data-command");
             let data = {
                 "action": command,
-                "args": ""
+                "args": this.getAttribute("args")
             }
 
             if(command == "updateWorld") {

@@ -32,7 +32,20 @@ const Actions = {
     PLACEUP: "placeUp",
     PLACEFORWARD: "placeForward",
     PLACEDOWN: "placeDown",
-    REFUEL: "refuel"
+    REFUEL: "refuel",
+    ATTACKUP: "attackUp",
+    ATTACKFORWARD: "attackForward",
+    ATTACKDOWN: "attackDown",
+    EQUIPLEFT: "equipLeft",
+    EQUIPRIGHT: "equipRight",
+    SUCKDOWN: "suckDown",
+    SUCKFORWARD: "suckForward",
+    SUCKUP: "suckUp",
+    DROPDOWN: "dropDown",
+    DROPFORWARD: "dropForward",
+    DROPUP: "dropUp",
+    TRANSFERTO: "transferTo",
+    CRAFT: "craft"
 }
 
 /*=========================== Turtle Class ===========================*/
@@ -82,10 +95,23 @@ class Turtle {
             "selectItem": async (slot) => {return this.selectSlot(slot);},
             "refuel": async (amount) => {return (await this.execute("turtle.refuel(" + amount + ")"));},
             "getItemDetail": async () => {return (await this.execute("turtle.getItemDetail()")).callback;},
-            "placeDown": async () => {return (await this.execute("turtle.placeDown()")).callback;},
-            "placeForward": async () => {return (await this.execute("turtle.place()")).callback;},
-            "placeUp": async () => {return (await this.execute("turtle.placeUp()")).callback;},
-            "stats": async () => {return this.getTurtleData();}
+            "placeDown": async (name) => {return this.placeDown(name);},
+            "placeForward": async (name) => {return await this.place(name);},
+            "placeUp": async (name) => {return this.placeUp(name);},
+            "stats": async () => {return this.getTurtleData();},
+            "attackForward": async () => {return (await this.execute("turtle.attack()"));},
+            "attackUp": async () => {return (await this.execute("turtle.attackUp()"));},
+            "attackDown": async () => {return (await this.execute("turtle.attackDown()"));},
+            "equipLeft": async () => {return (await this.execute("turtle.equipLeft()"));},
+            "equipRight": async () => {return (await this.execute("turtle.equipRight()"));},
+            "suckDown": async () => {return (await this.execute("turtle.suckDown()"));},
+            "suckForward": async () => {return (await this.execute("turtle.suck()"));},
+            "suckUp": async () => {return (await this.execute("turtle.suckUp()"));},
+            "dropDown": async () => {return (await this.execute("turtle.dropDown()"));},
+            "dropForward": async () => {return (await this.execute("turtle.drop()"));},
+            "dropUp": async () => {return (await this.execute("turtle.dropUp()"));},
+            "transferTo": async (args) => {return (await this.execute("turtle.transferTo(" + args.slot + ", " + args.amount + ")"));},
+            "craft": async (args) => {return (await this.execute("turtle.craft(" + args.name + ", " + args.amount + ")"));}
         }
     }
 
@@ -101,6 +127,32 @@ class Turtle {
         //console.log(`action ${action} took ${endTime - startTime} milliseconds`)
 
         return data;
+    }
+
+    async selectItemByName(name) {
+        for(let i = 0; i < this.inventory.length; i++) {
+            let itemI = this.inventory[i];
+
+            if(itemI.label == name) {
+                await this.executeAction(Actions.SELECTITEM, i + 1);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    async placeUp(name) {
+        return (await this.execute("turtle.placeUp()")).callback;
+    }
+
+    async place(name) {
+        return (await this.execute("turtle.place()")).callback;
+    }
+
+    async placeDown(name) {
+
+        return (await this.execute("turtle.placeDown()")).callback;
     }
 
     async selectSlot(slot) {

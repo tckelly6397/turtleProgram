@@ -75,8 +75,11 @@ body {
 .interaction-container Button {
     position: relative;
 
-    border: 2px solid;
     padding: 5px 5px;
+}
+
+#extra-container Button {
+    font-size: 11.8px;
 }
 
 #dig-container Button {
@@ -94,6 +97,21 @@ body {
     border-color: rgb(0, 133, 22);
 }
 
+#place-name-container Button {
+    background-color: rgb(20, 48, 206);
+    border-color: rgb(30, 0, 114);
+}
+
+#suck-container Button {
+    background-color: rgb(20, 194, 206);
+    border-color: rgb(0, 114, 99);
+}
+
+#drop-container Button {
+    background-color: rgb(255, 12, 255);
+    border-color: rgb(114, 0, 99);
+}
+
 .btn-group {
     height: 40px;
 }
@@ -107,12 +125,20 @@ body {
     display: flex;
 }
 
-/*
-#top-area div {
-    margin-left: 5px;
-    margin-right: 5px;
+#info-area {
+    flex: 1;
+    background-color: #3b3b3bbb;
+    border-radius: 8px;
+
+    margin-left: 8px;
+    margin-right: 8px;
+    padding: 5px;
+
+    -webkit-border-radius: 8px;
+    -moz-border-radius: 8px;
+    -ms-border-radius: 8px;
+    -o-border-radius: 8px;
 }
-*/
 
 #top-area #inventory {
     margin-left: auto;
