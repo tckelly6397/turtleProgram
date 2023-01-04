@@ -32,3 +32,4 @@ https://docs.google.com/document/d/1a4ert9upmV6r99dBzyar_n_ZdZ_TYz9vZFOH0HqIWp4/
 ## Screenshots
 ![Initial Tests](./images/example-12-30.PNG)
 ![Diamonds](./images/diamonds-12-30.PNG)
+![House](./images/house-1-2.PNG)

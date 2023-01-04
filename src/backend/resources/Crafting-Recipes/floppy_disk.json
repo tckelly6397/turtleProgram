@@ -1,0 +1,11 @@
+{
+    "map": [
+        " ","X"," ",
+        " ","Y"," ",
+        " "," "," "
+    ],
+    "items": {
+        "X": "minecraft:redsone",
+        "Y": "minecraft:paper"
+    }
+}

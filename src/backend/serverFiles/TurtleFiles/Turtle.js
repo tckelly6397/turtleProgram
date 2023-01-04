@@ -8,6 +8,9 @@ const { Vector3 } = require("three");
 const fs = require('fs');
 const Item = require("./item.js");
 
+/*=========================== Global Constants ===========================*/
+const namesPath = './src/backend/resources/TurtleData/names.json';
+
 /*=========================== ENUM Actions ===========================*/
 const Actions = {
 	FORWARD: "forward",
@@ -289,7 +292,7 @@ class Turtle {
 
         if(this.label == undefined) {
             //Get a random name
-            let names = fs.readFileSync("./src/backend/serverFiles/TurtleData/names.json", {encoding:'utf8', flag:'r'});
+            let names = fs.readFileSync(namesPath, {encoding:'utf8', flag:'r'});
             names = JSON.parse(names);
             let name = names[Math.ceil(Math.random() * names.length)];
 

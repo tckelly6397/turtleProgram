@@ -5,11 +5,12 @@
 
 /*=========================== Imports ===========================*/
 const { WebSocketServer } = require("ws");
-const { Turtle, Actions } = require("./Turtle.js");
-const SaveLoadManager = require("./SaveLoadManager.js");
+const { Turtle, Actions } = require("./TurtleFiles/Turtle.js");
+const SaveLoadManager = require("./TurtleFiles/SaveLoadManager.js");
 const fs = require('fs');
 
 /*=========================== Variables ===========================*/
+const turtleListPath = './src/backend/resources/TurtleData/turtleList.json';
 const port = 2553;
 const wss = new WebSocketServer({port});
 let turtles = [];
@@ -33,7 +34,7 @@ function updateWin(_win) {
 
 //Gets data from turtleList.json and applies it to the local turtleList
 function synchTurtleList() {
-    fs.readFile("./src/backend/serverFiles/TurtleData/turtleList.json", (err, data) => {
+    fs.readFile(turtleListPath, (err, data) => {
         if(data == undefined) {
             turtleList = [];
         } else {

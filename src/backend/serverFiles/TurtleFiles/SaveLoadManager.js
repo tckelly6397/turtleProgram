@@ -9,6 +9,8 @@ const fs = require('fs');
 
 /*=========================== Variables ===========================*/
 let turtleList;
+const worldsDir = './src/backend/resources/worlds/';
+const turtleListPath = './src/backend/resources/TurtleData/turtleList.json';
 
 //Maps a world name to local world data
 let LocalWorldMap = new Map();
@@ -42,7 +44,7 @@ function isTurtlesEqual(turtleClass, turtleData) {
 }
 
 function updateTurtleList() {
-    fs.writeFile("./src/backend/serverFiles/TurtleData/turtleList.json", JSON.stringify(turtleList), (err) => {
+    fs.writeFile(turtleListPath, JSON.stringify(turtleList), (err) => {
         return null;
     });
 }
@@ -118,7 +120,7 @@ function loadLocalWorld(Turtle) {
 
     //If the world data isn't already found then add it to the map
     if(LocalWorldMap.get(worldName) == undefined) {
-        fs.readFile("./src/backend/serverFiles/worlds/" + worldName, function read(err, data) {
+        fs.readFile(worldsDir + worldName, function read(err, data) {
             if(err) {
                 LocalWorldMap.set(worldName, []);
                 return;
@@ -163,7 +165,7 @@ function saveWorld(worldName, worldData) {
     if(worldData.length == 0) {
         return;
     }
-    fs.writeFile("./src/backend/serverFiles/worlds/" + worldName, JSON.stringify(worldData), (err) => {
+    fs.writeFile(worldsDir + worldName, JSON.stringify(worldData), (err) => {
         return null;
     });
 }

@@ -1,0 +1,12 @@
+{
+    "map": [
+        " "," "," ",
+        "Y","X","Z",
+        " "," "," "
+    ],
+    "items": {
+        "Y": "minecraft:diamond_pickaxe",
+        "X": "minecraft:turtle_normal",
+        "Z": "minecraft:crafting_table"
+    }
+}

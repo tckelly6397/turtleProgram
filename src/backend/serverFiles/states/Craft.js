@@ -21,15 +21,25 @@ const fs = require('fs');
 const Drop = require('./Drop.js');
 const SortInventory = require('./SortInventory.js');
 const TransferItems = require('./TransferItems.js');
-const Turtle = require('../Turtle.js');
+const Turtle = require('../TurtleFiles/Turtle.js');
 
 //Location of recipes
-const recipeDir = "./src/backend/serverFiles/Crafting-Recipes/";
+const recipeDir = "./src/backend/resources/Crafting-Recipes/";
 
 //A map of item names to recipe location
 const recipeLocations = {
-	"computercraft:computer_normal": recipeDir + "computer.json",
-	"computercraft:turtle_normal": recipeDir + "turtle.json"
+	"computer_normal": recipeDir + "computer.json",
+	"turtle_normal": recipeDir + "turtle.json",
+	"chest": recipeDir + "chest.json",
+	"crafting_table": recipeDir + "crafting_table.json",
+	"diamond_pickaxe": recipeDir + "diamond_pickaxe.json",
+	"disk_drive": recipeDir + "disk_drive.json",
+	"floppy_disk": recipeDir + "floppy_disk.json",
+	"full_turtle": recipeDir + "full_turtle.json",
+	"furnace": recipeDir + "furnace.json",
+	"glass_pane": recipeDir + "glass_pane.json",
+	"oak_planks": recipeDir + "oak_planks.json",
+	"sticks": recipeDir + "sticks.json"
 }
 
 //Get the minimum number from the list
@@ -206,6 +216,7 @@ async function transferAlgorithm(turtle, keyData, inventory, amount) {
 	await Drop.DropAllFilter(turtle, "Forward", Drop.DefinedSlots.SideSlots);
 }
 
+//If it successfully crafts return true
 async function Craft(turtle, name, amount) {
 	//Update the inventory
 	await turtle.updateInventory();
@@ -227,7 +238,7 @@ async function Craft(turtle, name, amount) {
 	if(amount == 0) {
 		console.log("Not all items are present.");
 		await turtle.executeAction(Turtle.Actions.DIGFORWARD);
-		return;
+		return false;
 	} else {
 		console.log("Starting to craft: " + amount);
 	}
@@ -253,6 +264,8 @@ async function Craft(turtle, name, amount) {
 
 	//Update the inventory
 	await turtle.updateInventory();
+
+	return true;
 }
 
 module.exports = { Craft };

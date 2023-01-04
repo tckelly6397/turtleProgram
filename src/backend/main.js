@@ -5,13 +5,13 @@
 /*=========================== Imports ===========================*/
 const { app, BrowserWindow, dialog } = require('electron');
 const path = require("path");
-const turtleApi = require("./serverFiles/turtleApi");
-const server = require("./serverFiles/server");
-const SaveLoadManager = require("./serverFiles/SaveLoadManager.js");
+const turtleApi = require("./serverFiles/TurtleFiles/turtleApi.js");
+const server = require("./serverFiles/server.js");
+const SaveLoadManager = require("./serverFiles/TurtleFiles/SaveLoadManager.js");
 
 /*=========================== Variables ===========================*/
 var win;
-
+const indexPath = './src/frontend/index.html';
 
 /*=========================== Functions ===========================*/
 function delay(time) {
@@ -34,7 +34,7 @@ function createWindow () {
     },
   })
 
-  win.loadFile(`./src/frontend/index.html`);
+  win.loadFile(indexPath);
 
   //Set the turtleApis and server win
   turtleApi.updateWin(win);

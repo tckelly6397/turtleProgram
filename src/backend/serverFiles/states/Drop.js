@@ -1,4 +1,4 @@
-const Turtle = require('../Turtle.js');
+const Turtle = require('../TurtleFiles/Turtle.js');
 
 //Defined slots presets
 const DefinedSlots = {
