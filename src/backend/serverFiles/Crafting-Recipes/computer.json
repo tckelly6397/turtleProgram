@@ -1,0 +1,12 @@
+{
+    "map": [
+        "X","X","X",
+        "X","Y","X",
+        "X","Z","X"
+    ],
+    "items": {
+        "X": "minecraft:stone",
+        "Y": "minecraft:redstone",
+        "Z": "minecraft:glass_pane"
+    }
+}

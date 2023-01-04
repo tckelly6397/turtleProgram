@@ -6,6 +6,8 @@ const Turtle = require('./Turtle.js');
 const prompt = require('electron-prompt');
 const Suck = require('./states/Suck.js');
 const Drop = require('./states/Drop.js');
+const TransferItems = require("./states/TransferItems.js");
+const Craft = require("./states/Craft.js");
 
 /*=========================== Variables ===========================*/
 let win;
@@ -149,7 +151,12 @@ ipcMain.on("frontState", async (event, args) => {
     await Suck.SuckAll(selectedTurtle, argument);
   } else if(state == 'drop') {
     //await Drop.DropAllFilter(selectedTurtle, argument, ["minecraft:dirt", "minecraft:stone"]); //["minecraft:dirt"]
-    await Drop.DropAll(selectedTurtle, argument);
+    //await Drop.DropAll(selectedTurtle, argument);
+    await Drop.DropSlots(selectedTurtle, argument, Drop.DefinedSlots.SideSlots);
+  } else if(state == 'transfer') {
+    await TransferItems.TransferItems(selectedTurtle, TransferItems.DefinedSlots.SideSlots);
+  } else if(state == 'craft') {
+    await Craft.Craft(selectedTurtle, "computercraft:turtle_normal", 3);
   }
 
   var endTime = performance.now();

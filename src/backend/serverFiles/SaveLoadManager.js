@@ -92,7 +92,8 @@ function addBlock(worldName, block) {
     }
 
     if(oldBlock == -1) {
-        WorldData.push(block);
+        let dataBlock = {"name": block.name, "x": block.x, "y": block.y, "z": block.z}
+        WorldData.push(dataBlock);
     }
 }
 
