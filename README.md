@@ -1,6 +1,6 @@
 # Turtle program
 ## Overview
-A desktop application based on the Electron framework using Three.js and WebSocket to execute. Uses data from clients to visualize and interact with a game. Using an AI system the turtles can do complex tasks.
+A desktop application based on the Electron framework using Three.js as the renderer and WebSocket to communicate. Uses data from clients to visualize and interact with a game. Using an AI system the turtles can do complex tasks.
 
 ## Inspired by
 https://www.youtube.com/watch?v=pwKRbsDbxqc&t=1682s
@@ -25,7 +25,9 @@ https://pastebin.com/RA1tvxHk
 
 ### Advanced
 -Furnace usage\
--Mining AI\
+-Building blueprints\
+-Pathfinding\
+-Mining\
 -Tree farming\
 -Hive AI
 
