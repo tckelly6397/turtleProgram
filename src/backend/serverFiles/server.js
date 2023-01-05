@@ -13,7 +13,7 @@ const fs = require('fs');
 /*=========================== Variables ===========================*/
 const turtleListPath = './src/backend/resources/TurtleData/turtleList.json';
 const port = 2553;
-const wss = new WebSocketServer({port});
+const wss = new WebSocketServer({port});;
 let turtles = [];
 let turtleList;
 let win;

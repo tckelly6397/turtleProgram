@@ -1,11 +1,14 @@
-const { LocalWorldMap } = require("../TurtleFiles/SaveLoadManager");
-const { distance } = require("mathjs");
+const { LocalWorldMap } = require("../TurtleFiles/SaveLoadManager.js");
+const Turtle = require("../TurtleFiles/Turtle.js");
 
 //Converts data to something readable by the Math.distance function
 function distancePos(x1, y1, z1, x2, y2, z2) {
-    let point1 = [x1, y1, z1];
-    let point2 = [x2, y2, z2];
-    return distance(point1, point2);
+    let deltaX = x2 - x1;
+    let deltaY = y2 - y1;
+    let deltaZ = z2 - z1;
+    distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ);
+
+    return distance;
 }
 
 //Get the distance between two nodes
@@ -135,12 +138,25 @@ function getOpenNeighborsOfNode(current, map, neighborList, beginNode, endNode) 
     let y = current.y;
     let z = current.z;
 
-    neighbors.push(addNodeFromMap(x + 1, y, z, map, neighborList, beginNode, endNode));
-    neighbors.push(addNodeFromMap(x - 1, y, z, map, neighborList, beginNode, endNode));
-    neighbors.push(addNodeFromMap(x, y + 1, z, map, neighborList, beginNode, endNode));
-    neighbors.push(addNodeFromMap(x, y - 1, z, map, neighborList, beginNode, endNode));
-    neighbors.push(addNodeFromMap(x, y, z + 1, map, neighborList, beginNode, endNode));
-    neighbors.push(addNodeFromMap(x, y, z - 1, map, neighborList, beginNode, endNode));
+    //HORRENDOUS CODE
+    let node1 = addNodeFromMap(x + 1, y, z, map, neighborList, beginNode, endNode);
+    if(node1 != undefined)
+        neighbors.push(node1);
+    let node2 = addNodeFromMap(x - 1, y, z, map, neighborList, beginNode, endNode);
+    if(node2 != undefined)
+        neighbors.push(node2);
+    let node3 = addNodeFromMap(x, y + 1, z, map, neighborList, beginNode, endNode);
+    if(node3 != undefined)
+        neighbors.push(node3);
+    let node4 = addNodeFromMap(x, y - 1, z, map, neighborList, beginNode, endNode);
+    if(node4 != undefined)
+        neighbors.push(node4);
+    let node5 = addNodeFromMap(x, y, z + 1, map, neighborList, beginNode, endNode);
+    if(node5 != undefined)
+        neighbors.push(node5);
+    let node6 = addNodeFromMap(x, y, z - 1, map, neighborList, beginNode, endNode);
+    if(node6 != undefined)
+        neighbors.push(node6);
 
     return neighbors;
 }
@@ -159,6 +175,64 @@ function getPath(beginNode, endNode) {
     path.push(current);
 
     return path.reverse();
+}
+
+//Rotates the turtle until its facing the correct direction on X
+async function rotateToPositionX(turtle, deltaX) {
+
+    while(deltaX != (Math.round(Math.cos(turtle.rotation * (Math.PI/180))))) {
+        await turtle.executeAction(Turtle.Actions.TURNRIGHT);
+    }
+}
+
+//Rotates the turtle until its facing the correct direction on Z
+async function rotateToPositionZ(turtle, deltaZ) {
+
+    while(deltaZ != Math.round(Math.sin(turtle.rotation * (Math.PI/180)))) {
+        await turtle.executeAction(Turtle.Actions.TURNRIGHT);
+    }
+}
+
+async function moveToNode(turtle, node) {
+    let deltaX = node.x - turtle.position.x;
+    let deltaY = node.y - turtle.position.y;
+    let deltaZ = node.z - turtle.position.z;
+
+    //Move on y axis
+    if(deltaY == 1) {
+        await turtle.executeAction(Turtle.Actions.UP);
+        return;
+    } else if(deltaY == -1) {
+        await turtle.executeAction(Turtle.Actions.DOWN);
+        return;
+    }
+
+    if(deltaX == 1 || deltaX == -1) {
+        //Rotate
+        await rotateToPositionX(turtle, deltaX);
+        //Move
+        await turtle.executeAction(Turtle.Actions.FORWARD);
+        return;
+    }
+
+    if(deltaZ == 1 || deltaZ == -1) {
+        //Rotate
+        await rotateToPositionZ(turtle, deltaZ);
+        //Move
+        await turtle.executeAction(Turtle.Actions.FORWARD);
+        return;
+    }
+}
+
+//Execute actions given a path
+//Each node should be one away from the current turtles position
+async function executePath(turtle, path) {
+
+    for(let i = 0; i < path.length; i++) {
+        let node = path[i];
+
+        await moveToNode(turtle, node);
+    }
 }
 
 async function Pathfind(turtle, endX, endY, endZ) {
@@ -181,19 +255,16 @@ async function Pathfind(turtle, endX, endY, endZ) {
     while(openList.length > 0) {
         let current = openList[0]
         current = getOpenWithLowestFCost(openList);
-        console.log(current);
-
         removeItemFromList(current, openList);
 
         closedList.push(current);
 
         if(isNodesEqual(current, endNode)) {
-            console.log("equals");
-            return;
+            endNode = current;
+            break;
         }
 
         let neighbors = getOpenNeighborsOfNode(current, map, neighborList, beginNode, endNode);
-        //console.log(neighbors);
         for(let i = 0; i < neighbors.length; i++) {
             let neighbor = neighbors[i];
             neighborList.push(neighbor);
@@ -203,7 +274,6 @@ async function Pathfind(turtle, endX, endY, endZ) {
             }
 
             let newPath = current.gCost + distanceNodes(current, neighbor);
-            console.log(newPath + " " + neighbor.gCost);
             if(newPath < neighbor.gCost || openList.indexOf(neighbor) == -1) {
                 neighbor.gCost = newPath;
                 neighbor.hCost = distanceNodes(neighbor, endNode);
@@ -219,7 +289,8 @@ async function Pathfind(turtle, endX, endY, endZ) {
     //Traverse through the parents
     let nodePath = getPath(beginNode, endNode);
 
-    console.log(nodePath);
+    //Make the turtle move
+    await executePath(turtle, nodePath);
 }
 
 //THE PROBLEM IS THAT EACH TIME YOU GET NEIGHBORS YOU CREATE A NEW NODE FOR EACH NEIGHBOR, KEEP TRACK OF NEIGHBORS WHEN CREATED

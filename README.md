@@ -7,16 +7,15 @@ https://www.youtube.com/watch?v=pwKRbsDbxqc&t=1682s
 
 ## Environment setup
 ### Node Modules
-electron
-electron-prompt
-ws
+electron\
+electron-prompt\
+ws\
 three
-mathjs
 
 ## Turtle setup
 Paste this as startup\
-pastebin get RA1tvxHk startup
-https://pastebin.com/RA1tvxHk
+pastebin get maY5fQmM startup\
+https://pastebin.com/maY5fQmM
 
 ## Features
 -Crafting\
@@ -25,7 +24,8 @@ https://pastebin.com/RA1tvxHk
 -Inventory sorting\
 -Inventory management\
 -Saving and Loading\
--Visualization
+-Visualization\
+-Pathfinding
 
 ## ToDo
 ### Basics
@@ -34,7 +34,6 @@ https://pastebin.com/RA1tvxHk
 ### Advanced
 -Furnace usage\
 -Building blueprints\
--Pathfinding\
 -Mining\
 -Tree farming\
 -Hive AI
