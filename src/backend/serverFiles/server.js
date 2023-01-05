@@ -7,6 +7,7 @@
 const { WebSocketServer } = require("ws");
 const { Turtle, Actions } = require("./TurtleFiles/Turtle.js");
 const SaveLoadManager = require("./TurtleFiles/SaveLoadManager.js");
+const { recipeLocations } = require("./states/Craft");
 const fs = require('fs');
 
 /*=========================== Variables ===========================*/
@@ -20,9 +21,6 @@ let win;
 //Display the server is running
 console.log(`Listening at ${port}...`);
 
-//Update local turtleList
-synchTurtleList();
-
 //Begin pinging turtles
 pingTurtles();
 
@@ -30,6 +28,19 @@ pingTurtles();
 //Update the local window
 function updateWin(_win) {
     win = _win;
+
+    win.webContents.on('did-finish-load', function() {
+        //Update local turtleList
+        synchTurtleList();
+
+        //Send crafting recipes
+        sendCrafting();
+    });
+}
+
+//Send the crafting locations to the front end
+function sendCrafting() {
+    win.webContents.send("backSendRecipeLocations", JSON.stringify(recipeLocations));
 }
 
 //Gets data from turtleList.json and applies it to the local turtleList
@@ -43,7 +54,7 @@ function synchTurtleList() {
         SaveLoadManager.initialize(turtleList);
 
         //Send the turtle list to the front end giving time for front end to load
-        setTimeout(() => {win.webContents.send("backSendTurtleList", turtleList);}, 1500);
+        win.webContents.send("backSendTurtleList", turtleList);
     });
 }
 
@@ -92,9 +103,6 @@ function pingTurtles() {
     turtles.forEach(turtle => {
         turtle.executeAction(Actions.GETLABEL).catch(e => {
             console.log("Turtle disconnected: " + turtle.label);
-
-            //Save the turtle
-            //SaveLoadManager.saveTurtle(turtle);
 
             //Remove the turtle
             const index = turtles.indexOf(turtle);

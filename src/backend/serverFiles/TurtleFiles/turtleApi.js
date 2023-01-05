@@ -16,14 +16,12 @@ let selectedTurtle;
 
 /*=========================== Util Functions ===========================*/
 //Call detect on the turtle and send the data to the frontend
-function detectAll(Turtle) {
-  let jsonData = Turtle.detect();
-  jsonData.then((data) => {
-    win.webContents.send("detected", data);
+async function detectAll(Turtle) {
+  let jsonData = await Turtle.detect();
+    win.webContents.send("detected", jsonData);
 
     //Send to the save load manager
-    SaveLoadManager.updateLocalWorld(Turtle, data);
-  });
+    SaveLoadManager.updateLocalWorld(Turtle, jsonData);
 }
 
 //Takes in a turtle class and a turtle json and checks if equal
@@ -91,7 +89,7 @@ async function updateData() {
   win.webContents.send("updateTurtleData", JSON.stringify(selectedTurtle.getTurtleData()));
 
   //On movement detect
-  detectAll(selectedTurtle);
+  await detectAll(selectedTurtle);
 }
 
 /*=========================== Events ===========================*/
@@ -163,9 +161,18 @@ ipcMain.on("frontState", async (event, args) => {
   }
 
   var endTime = performance.now();
-  console.log(`state ${state} took ${endTime - startTime} milliseconds`)
+  console.log(`state ${state} took ${endTime - startTime} milliseconds`);
 
   win.webContents.send("updateTurtleData", JSON.stringify(selectedTurtle.getTurtleData()));
+});
+
+ipcMain.on("frontExecuteCraft", async (event, args) => {
+  var startTime = performance.now()
+
+  await Craft.Craft(selectedTurtle, args, 64);
+
+  var endTime = performance.now();
+  console.log(`craft ${args} took ${endTime - startTime} milliseconds`);
 });
 
 module.exports = { updateWin };

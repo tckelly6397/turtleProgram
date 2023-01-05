@@ -102,7 +102,6 @@ async function TransferSpecificItem(turtle, transferData) {
 
         if(leftOver != 0 && toSlots[toSlots.length - 1] != undefined) {
             //Transfer the item
-            //console.log("transferSlot in undefined: " + toSlots[0]);
             await transfer(turtle, toSlots[toSlots.length - 1], leftOver);
 
             initialAmount = amount - leftOver;

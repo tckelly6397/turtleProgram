@@ -191,19 +191,19 @@ function getTurtleDataByLabel(label, id) {
 }
 
 //Takes the local data and stores it in the correct map location
-function saveWorld(worldName, worldData) {
+async function saveWorld(worldName, worldData) {
     if(worldData.length == 0) {
         return;
     }
-    fs.writeFile(worldsDir + worldName, JSON.stringify(worldData), (err) => {
+    await fs.writeFileSync(worldsDir + worldName, JSON.stringify(worldData), (err) => {
         return null;
     });
 }
 
 //Saves all the worlds in the map as well as the saves the turtleList
-function saveWorlds() {
+async function saveWorlds() {
     for (let [key, value] of LocalWorldMap) {
-        saveWorld(key, value);
+        await saveWorld(key, value);
     }
 
     updateTurtleList();

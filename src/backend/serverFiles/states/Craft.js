@@ -268,4 +268,4 @@ async function Craft(turtle, name, amount) {
 	return true;
 }
 
-module.exports = { Craft };
+module.exports = { Craft, recipeLocations };

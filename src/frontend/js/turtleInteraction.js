@@ -65,7 +65,7 @@ window.api.receive("backSendTurtleList", (data) => {
     let turtleDrop = document.getElementById("turtle-list");
     turtleDrop.innerHTML = '';
 
-    //For each turtle in the list add it to the drop down list
+    //For each turtle in the list add it to the drop down
     data.forEach(t => {
         let element = document.createElement("a");
         element.classList.add("dropdown-item");
@@ -74,6 +74,22 @@ window.api.receive("backSendTurtleList", (data) => {
         element.setAttribute("onclick", clickCommand);
         turtleDrop.appendChild(element);
     });
+});
+
+window.api.receive("backSendRecipeLocations", (data) => {
+    let list = JSON.parse(data);
+
+    let craftingList = document.getElementById("crafting-list");
+
+    //For each item in the craftingList add it to the drop down
+    for(let key of Object.keys(list)) {
+        let element = document.createElement("a");
+        element.classList.add("dropdown-item");
+        element.innerText = key
+        let clickCommand = "window.api.send(\"frontExecuteCraft\", \"" + key + "\");"
+        element.setAttribute("onclick", clickCommand);
+        craftingList.appendChild(element);
+    }
 });
 
 /*=========================== Controls ===========================*/

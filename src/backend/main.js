@@ -14,10 +14,6 @@ var win;
 const indexPath = './src/frontend/index.html';
 
 /*=========================== Functions ===========================*/
-function delay(time) {
-  return new Promise(resolve => setTimeout(resolve, time));
-}
-
 //Create a window
 function createWindow () {
   win = new BrowserWindow({
@@ -62,10 +58,7 @@ function windowCloseEvent(e) {
         app.quit()
       } else if (response == 1) {
         //Save
-        //win.webContents.send("retrieveAndUpdateWorldData");
-        SaveLoadManager.saveWorlds();
-
-        await delay(500);
+        await SaveLoadManager.saveWorlds();
         win.destroy();
         app.quit();
       }
