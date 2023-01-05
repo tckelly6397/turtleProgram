@@ -15,7 +15,7 @@
   "keywords": [
     "cc"
   ],
-  "author": "Thomas Kelly",
+  "author": "tckelly6397",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/tckelly6397/turtleProgram/issues"
@@ -25,6 +25,7 @@
     "electron": "^22.0.0",
     "electron-prompt": "^1.7.0",
     "electron-reload": "^2.0.0-alpha.1",
+    "mathjs": "^11.5.0",
     "path": "^0.12.7",
     "prompt-sync": "^4.2.0",
     "react": "^18.2.0",

@@ -5,6 +5,14 @@ A desktop application based on the Electron framework using Three.js as the rend
 ## Inspired by
 https://www.youtube.com/watch?v=pwKRbsDbxqc&t=1682s
 
+## Environment setup
+### Node Modules
+electron
+electron-prompt
+ws
+three
+mathjs
+
 ## Turtle setup
 Paste this as startup\
 pastebin get RA1tvxHk startup

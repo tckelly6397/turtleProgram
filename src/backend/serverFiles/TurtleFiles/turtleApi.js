@@ -9,6 +9,7 @@ const Drop = require('../states/Drop.js');
 const TransferItems = require('../states/TransferItems.js');
 const Craft = require('../states/Craft.js');
 const Replicate = require('../states/Replicate.js');
+const Pathfind = require('../states/Pathfind.js');
 
 /*=========================== Variables ===========================*/
 let win;
@@ -154,10 +155,10 @@ ipcMain.on("frontState", async (event, args) => {
     await Drop.DropSlots(selectedTurtle, argument, Drop.DefinedSlots.SideSlots);
   } else if(state == 'transfer') {
     await TransferItems.TransferItems(selectedTurtle, TransferItems.DefinedSlots.SideSlots);
-  } else if(state == 'craft') {
-    await Craft.Craft(selectedTurtle, "turtle_normal", 3);
   } else if(state == 'replicate') {
     await Replicate.Replicate(selectedTurtle);
+  } else if(state == 'pathfind') {
+    await Pathfind.Pathfind(selectedTurtle, 1, 0, -9);
   }
 
   var endTime = performance.now();

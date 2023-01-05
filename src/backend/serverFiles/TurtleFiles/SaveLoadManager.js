@@ -225,7 +225,7 @@ function getWorldData(worldName) {
     return LocalWorldMap.get(worldName);
 }
 
-module.exports = { initialize, update, updateTurtle, updateLocalWorld, saveWorlds, saveTurtle, getWorldData, getTurtleDataByLabel, updateTurtleByData, updateTurtleList };
+module.exports = { initialize, update, updateTurtle, updateLocalWorld, saveWorlds, saveTurtle, getWorldData, getTurtleDataByLabel, updateTurtleByData, updateTurtleList, LocalWorldMap };
 
 //Usage
 //initialize(list): read in the turtle list and apply it to the local list as well as loading in the local world map data

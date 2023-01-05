@@ -57,18 +57,18 @@ loader.load('./models/untitled.glb', function(gltf) {
 /*=========================== Animation and Main Loop ===========================*/
 animate();
 
-// The animated function updates the scene, the controls and the turtle position
+//The animated function updates the scene, the controls and the turtle position
 function animate() {
 
-    // The window.requestAnimationFrame() method tells the browser that you wish to perform an animation and requests that the browser calls a specified function to update an animation before the next repaint. (docs)
+    //The window.requestAnimationFrame() method tells the browser that you wish to perform an animation and requests that the browser calls a specified function to update an animation before the next repaint. (docs)
     requestAnimationFrame(animate);
 
-    // Update the controls
+    //Update the controls
     controls.update();
 
     //Update turtle
     turtleObj.updateMatrix();
 
-    // Render the scene
+    //Render the scene
     renderer.render(scene, camera);
 }
