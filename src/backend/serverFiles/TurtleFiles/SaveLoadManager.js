@@ -44,7 +44,7 @@ function isTurtlesEqual(turtleClass, turtleData) {
 }
 
 function updateTurtleList() {
-    fs.writeFile(turtleListPath, JSON.stringify(turtleList), (err) => {
+    fs.writeFileSync(turtleListPath, JSON.stringify(turtleList), (err) => {
         return null;
     });
 }
@@ -160,6 +160,36 @@ function updateTurtle(Turtle) {
     turtleList[turtleIndex] = Turtle.getTurtleData();
 }
 
+function getTurtleIndexByLabel(label, id) {
+    for(let i = 0; i < turtleList.length; i++) {
+        let turtleData = turtleList[i];
+
+        if(label == turtleData.label && id == turtleData.computerId) {
+            return i;
+        }
+    }
+}
+
+function updateTurtleByData(turtleData) {
+    //Get reference to location of turtle data
+    let turtleIndex = getTurtleIndexByLabel(turtleData.label, turtleData.computerId);
+
+    //Update the turtle data
+    turtleList[turtleIndex] = turtleData;
+}
+
+function getTurtleDataByLabel(label, id) {
+    for(let i = 0; i < turtleList.length; i++) {
+        let turtleData = turtleList[i];
+
+        if(label == turtleData.label && id == turtleData.computerId) {
+            return turtleData;
+        }
+    }
+
+    return undefined;
+}
+
 //Takes the local data and stores it in the correct map location
 function saveWorld(worldName, worldData) {
     if(worldData.length == 0) {
@@ -195,7 +225,7 @@ function getWorldData(worldName) {
     return LocalWorldMap.get(worldName);
 }
 
-module.exports = { initialize, update, updateTurtle, updateLocalWorld, saveWorlds, saveTurtle, getWorldData };
+module.exports = { initialize, update, updateTurtle, updateLocalWorld, saveWorlds, saveTurtle, getWorldData, getTurtleDataByLabel, updateTurtleByData, updateTurtleList };
 
 //Usage
 //initialize(list): read in the turtle list and apply it to the local list as well as loading in the local world map data

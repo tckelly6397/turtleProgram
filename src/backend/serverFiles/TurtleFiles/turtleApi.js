@@ -1,13 +1,14 @@
 /*=========================== Imports ===========================*/
-const server = require("../server.js");
+const server = require('../server.js');
 const { ipcMain } = require('electron');
 const SaveLoadManager = require('./SaveLoadManager');
 const Turtle = require('./Turtle.js');
 const prompt = require('electron-prompt');
 const Suck = require('../states/Suck.js');
 const Drop = require('../states/Drop.js');
-const TransferItems = require("../states/TransferItems.js");
-const Craft = require("../states/Craft.js");
+const TransferItems = require('../states/TransferItems.js');
+const Craft = require('../states/Craft.js');
+const Replicate = require('../states/Replicate.js');
 
 /*=========================== Variables ===========================*/
 let win;
@@ -157,6 +158,8 @@ ipcMain.on("frontState", async (event, args) => {
     await TransferItems.TransferItems(selectedTurtle, TransferItems.DefinedSlots.SideSlots);
   } else if(state == 'craft') {
     await Craft.Craft(selectedTurtle, "turtle_normal", 3);
+  } else if(state == 'replicate') {
+    await Replicate.Replicate(selectedTurtle);
   }
 
   var endTime = performance.now();

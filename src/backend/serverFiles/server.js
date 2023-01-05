@@ -104,7 +104,7 @@ function pingTurtles() {
         });
     });
 
-    setTimeout(pingTurtles, 2000);
+    setTimeout(pingTurtles, 5000);
 }
 
 /*=========================== WebSocket Connection ===========================*/

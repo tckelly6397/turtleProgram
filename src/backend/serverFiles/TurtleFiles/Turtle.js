@@ -48,7 +48,10 @@ const Actions = {
     DROPFORWARD: "dropForward",
     DROPUP: "dropUp",
     TRANSFERTO: "transferTo",
-    CRAFT: "craft"
+    CRAFT: "craft",
+    GETTURTLEDATA: "getTurtleData",
+    REBOOTTURTLE: "rebootTurtle",
+    TURNONTURTLE: "turnOnTurtle"
 }
 
 /*=========================== Turtle Class ===========================*/
@@ -79,12 +82,12 @@ class Turtle {
         /*=========================== Action Map ===========================*/
         //Maps action names to function executions
         this.actionMap = {
-            [Actions.FORWARD]: () => {return this.moveForward();},
-            [Actions.BACK]: () => {return this.moveBackward();},
-            [Actions.UP]: () => {return this.moveUp();},
-            [Actions.DOWN]: () => {return this.moveDown();},
-            [Actions.TURNRIGHT]: () => {return this.turnRight();},
-            [Actions.TURNLEFT]: () => {return this.turnLeft();},
+            [Actions.FORWARD]: async () => {return await this.moveForward();},
+            [Actions.BACK]: async () => {return await this.moveBackward();},
+            [Actions.UP]: async () => {return await this.moveUp();},
+            [Actions.DOWN]: async () => {return await this.moveDown();},
+            [Actions.TURNRIGHT]: async () => {return await this.turnRight();},
+            [Actions.TURNLEFT]: async () => {return await this.turnLeft();},
             [Actions.DIGFORWARD]: async () => {return (await this.execute("turtle.dig()")).callback;},
             [Actions.DIGUP]: async () => {return (await this.execute("turtle.digUp()")).callback;},
             [Actions.DIGDOWN]: async () => {return (await this.execute("turtle.digDown()")).callback;},
@@ -114,7 +117,10 @@ class Turtle {
             [Actions.DROPFORWARD]: async () => {return await this.drop("");},
             [Actions.DROPUP]: async () => {return await this.drop("Up");},
             [Actions.TRANSFERTO]: async (args) => {return (await this.execute("turtle.transferTo(" + args.slot + ", " + args.amount + ")"));},
-            [Actions.CRAFT]: async (args) => {return (await this.execute("turtle.craft(" + args.amount + ")"));}
+            [Actions.CRAFT]: async (args) => {return (await this.execute("turtle.craft(" + args.amount + ")"));},
+            [Actions.GETTURTLEDATA]: async (args) => {return (await this.getExternalTurtleData(args));},
+            [Actions.REBOOTTURTLE]: async (args) => {return (await this.execute("peripheral.wrap(\"" + args.direction + "\").reboot()"))},
+            [Actions.TURNONTURTLE]: async (args) => {return (await this.execute("peripheral.wrap(\"" + args.direction + "\").turnOn()"))}
         }
     }
 
@@ -245,6 +251,17 @@ class Turtle {
         return data.callback;
     }
 
+    async getExternalTurtleData(args) {
+        let direction = args.direction;
+
+        let data = {
+            "label": (await this.execute("peripheral.wrap(\"" + direction + "\").getLabel()")).callback,
+            "computerId": (await this.execute("peripheral.wrap(\"" + direction + "\").getID()")).callback
+        }
+
+        return data;
+    }
+
     waitFor(conditionFunction) {
         const poll = resolve => {
           if(conditionFunction()) resolve();
@@ -273,12 +290,16 @@ class Turtle {
             this.ws.on('message', (message) => {
                 this.busy = false;
 
-                resolve(JSON.parse(message));
+                if(message == "undefined") {
+                    reject(message);
+                } else {
+                    resolve(JSON.parse(message));
+                }
             });
 
             //Took too long
             setTimeout(() => {
-                reject("Error");
+                reject("Error from [" + this.label + "] while running [" + data.command + "]");
             }, 1000);
         });
     }
