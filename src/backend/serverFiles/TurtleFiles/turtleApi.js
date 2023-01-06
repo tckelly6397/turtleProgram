@@ -158,7 +158,7 @@ ipcMain.on("frontState", async (event, args) => {
   } else if(state == 'replicate') {
     await Replicate.Replicate(selectedTurtle);
   } else if(state == 'pathfind') {
-    await Pathfind.Pathfind(selectedTurtle, 1, 0, -9);
+    await Pathfind.Pathfind(selectedTurtle, 1, 0, -9, win);
   }
 
   var endTime = performance.now();

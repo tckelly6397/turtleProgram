@@ -2,6 +2,8 @@ const SaveLoadManager = require("../TurtleFiles/SaveLoadManager.js");
 const Turtle = require("../TurtleFiles/Turtle.js");
 const { Heap } = require('heap-js');
 
+let win;
+
 //Converts data to something readable by the Math.distance function
 function distancePos(x1, y1, z1, x2, y2, z2) {
     let deltaX = x2 - x1;
@@ -53,31 +55,6 @@ function getEndNode(x, y, z, beginX, beginY, beginZ) {
     return node;
 }
 
-//Gets the node with the lowest fCost
-function getOpenWithLowestFCost(list) {
-    let minNode = list[0];
-
-    for(let i = 1; i < list.length; i++) {
-        let node = list[i];
-        let fCost = node.fCost;
-        let hCost = node.hCost;
-
-        if(fCost < minNode.fCost || fCost == minNode.hCost && hCost < minNode.hCost) {
-            minFCost = fCost;
-        }
-    }
-
-    return minNode;
-}
-
-//Given a list remove an item
-function removeItemFromList(item, list) {
-    const index = list.indexOf(item);
-
-    if(index != -1) {
-        list.splice(index, 1);
-    }
-}
 
 //Check if two nodes are equal
 function isNodesEqual(node1, node2) {
@@ -221,6 +198,7 @@ async function rotateToPositionZ(turtle, deltaZ) {
 //Call detect on the turtle and send the data to the frontend
 async function detectAll(turtle) {
     let jsonData = await turtle.detect();
+    win.webContents.send("detected", jsonData);
 
     //Send to the save load manager
     SaveLoadManager.updateLocalWorld(turtle, jsonData);
@@ -270,13 +248,17 @@ async function executePath(turtle, path, endX, endY, endZ) {
 
         if(moved == false) {
             await detectAll(turtle);
-            await Pathfind(turtle, endX, endY, endZ);
+            await Pathfind(turtle, endX, endY, endZ, win);
             return;
         }
+
+        SaveLoadManager.updateTurtle(turtle);
+        win.webContents.send("updateTurtleData", JSON.stringify(turtle.getTurtleData()));
     }
 }
 
-async function Pathfind(turtle, endX, endY, endZ) {
+async function Pathfind(turtle, endX, endY, endZ, win_) {
+    win = win_;
     let startTime = performance.now()
     let beginX = turtle.position.x;
     let beginY = turtle.position.y;
@@ -337,7 +319,7 @@ async function Pathfind(turtle, endX, endY, endZ) {
     await executePath(turtle, nodePath, endX, endY, endZ);
 
     //Send to the save load manager
-    SaveLoadManager.updateLocalWorld(Turtle, jsonData);
+    SaveLoadManager.updateTurtle(turtle);
 }
 
 module.exports = { Pathfind };
