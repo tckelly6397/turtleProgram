@@ -1,5 +1,6 @@
-const { LocalWorldMap } = require("../TurtleFiles/SaveLoadManager.js");
+const SaveLoadManager = require("../TurtleFiles/SaveLoadManager.js");
 const Turtle = require("../TurtleFiles/Turtle.js");
+const { Heap } = require('heap-js');
 
 //Converts data to something readable by the Math.distance function
 function distancePos(x1, y1, z1, x2, y2, z2) {
@@ -181,7 +182,19 @@ function getPath(beginNode, endNode) {
 async function rotateToPositionX(turtle, deltaX) {
 
     while(deltaX != (Math.round(Math.cos(turtle.rotation * (Math.PI/180))))) {
-        await turtle.executeAction(Turtle.Actions.TURNRIGHT);
+        let rotationCos = Math.round(Math.sin(turtle.rotation * (Math.PI/180)));
+
+        if(rotationCos == 1 && deltaX == 1) {
+            await turtle.executeAction(Turtle.Actions.TURNLEFT);
+        } else if(rotationCos == -1 && deltaX == 1) {
+            await turtle.executeAction(Turtle.Actions.TURNRIGHT);
+        } else if(rotationCos == 1 && deltaX == -1) {
+            await turtle.executeAction(Turtle.Actions.TURNRIGHT);
+        } else if(rotationCos == -1 && deltaX == -1) {
+            await turtle.executeAction(Turtle.Actions.TURNLEFT);
+        } else {
+            await turtle.executeAction(Turtle.Actions.TURNLEFT);
+        }
     }
 }
 
@@ -189,8 +202,28 @@ async function rotateToPositionX(turtle, deltaX) {
 async function rotateToPositionZ(turtle, deltaZ) {
 
     while(deltaZ != Math.round(Math.sin(turtle.rotation * (Math.PI/180)))) {
-        await turtle.executeAction(Turtle.Actions.TURNRIGHT);
+        let rotationSin = Math.round(Math.cos(turtle.rotation * (Math.PI/180)));
+
+        if(rotationSin == -1 && deltaZ == -1) {
+            await turtle.executeAction(Turtle.Actions.TURNRIGHT);
+        } else if(rotationSin == 1 && deltaZ == -1) {
+            await turtle.executeAction(Turtle.Actions.TURNLEFT);
+        } else if(rotationSin == -1 && deltaZ == 1) {
+            await turtle.executeAction(Turtle.Actions.TURNLEFT);
+        } else if(rotationSin == 1 && deltaZ == 1) {
+            await turtle.executeAction(Turtle.Actions.TURNRIGHT);
+        } else {
+            await turtle.executeAction(Turtle.Actions.TURNLEFT);
+        }
     }
+}
+
+//Call detect on the turtle and send the data to the frontend
+async function detectAll(turtle) {
+    let jsonData = await turtle.detect();
+
+    //Send to the save load manager
+    SaveLoadManager.updateLocalWorld(turtle, jsonData);
 }
 
 async function moveToNode(turtle, node) {
@@ -200,62 +233,70 @@ async function moveToNode(turtle, node) {
 
     //Move on y axis
     if(deltaY == 1) {
-        await turtle.executeAction(Turtle.Actions.UP);
-        return;
+        let moved = await turtle.executeAction(Turtle.Actions.UP);
+        return moved;
     } else if(deltaY == -1) {
-        await turtle.executeAction(Turtle.Actions.DOWN);
-        return;
+        let moved = await turtle.executeAction(Turtle.Actions.DOWN);
+        return moved;
     }
 
     if(deltaX == 1 || deltaX == -1) {
         //Rotate
         await rotateToPositionX(turtle, deltaX);
         //Move
-        await turtle.executeAction(Turtle.Actions.FORWARD);
-        return;
+        let moved = await turtle.executeAction(Turtle.Actions.FORWARD);
+        return moved;
     }
 
     if(deltaZ == 1 || deltaZ == -1) {
         //Rotate
         await rotateToPositionZ(turtle, deltaZ);
         //Move
-        await turtle.executeAction(Turtle.Actions.FORWARD);
-        return;
+        let moved = await turtle.executeAction(Turtle.Actions.FORWARD);
+        return moved;
     }
+
+    return true;
 }
 
 //Execute actions given a path
 //Each node should be one away from the current turtles position
-async function executePath(turtle, path) {
+async function executePath(turtle, path, endX, endY, endZ) {
 
     for(let i = 0; i < path.length; i++) {
         let node = path[i];
 
-        await moveToNode(turtle, node);
+        let moved = await moveToNode(turtle, node);
+
+        if(moved == false) {
+            await detectAll(turtle);
+            await Pathfind(turtle, endX, endY, endZ);
+            return;
+        }
     }
 }
 
 async function Pathfind(turtle, endX, endY, endZ) {
+    let startTime = performance.now()
     let beginX = turtle.position.x;
     let beginY = turtle.position.y;
     let beginZ = turtle.position.z;
 
     //Main variables
-    let openList = [];
+    const customComparator = (a, b) => (a.gCost + a.hCost) - (b.gCost + b.hCost);
+    let openList = new Heap(customComparator);
     let closedList = [];
     let neighborList = [];
 
-    let map = LocalWorldMap.get(turtle.mapLocation);
+    let map = SaveLoadManager.LocalWorldMap.get(turtle.mapLocation);
 
     //Initialize nodes and list
     let beginNode = getBeginNode(beginX, beginY, beginZ, endX, endY, endZ);
     let endNode = getEndNode(endX, endY, endZ, beginX, beginY, beginZ);
-    openList.push(beginNode);
+    openList.add(beginNode);
 
     while(openList.length > 0) {
-        let current = openList[0]
-        current = getOpenWithLowestFCost(openList);
-        removeItemFromList(current, openList);
+        let current = openList.pop();
 
         closedList.push(current);
 
@@ -274,13 +315,13 @@ async function Pathfind(turtle, endX, endY, endZ) {
             }
 
             let newPath = current.gCost + distanceNodes(current, neighbor);
-            if(newPath < neighbor.gCost || openList.indexOf(neighbor) == -1) {
+            if(newPath < neighbor.gCost || !openList.contains(neighbor)) {
                 neighbor.gCost = newPath;
                 neighbor.hCost = distanceNodes(neighbor, endNode);
                 neighbor.parent = current;
 
-                if(openList.indexOf(neighbor) == -1) {
-                    openList.push(neighbor);
+                if(!openList.contains(neighbor)) {
+                    openList.add(neighbor);
                 }
             }
         }
@@ -289,10 +330,14 @@ async function Pathfind(turtle, endX, endY, endZ) {
     //Traverse through the parents
     let nodePath = getPath(beginNode, endNode);
 
-    //Make the turtle move
-    await executePath(turtle, nodePath);
-}
+    let endTime = performance.now();
+    console.log(`finding the path took ${endTime - startTime} milliseconds`);
 
-//THE PROBLEM IS THAT EACH TIME YOU GET NEIGHBORS YOU CREATE A NEW NODE FOR EACH NEIGHBOR, KEEP TRACK OF NEIGHBORS WHEN CREATED
+    //Make the turtle move
+    await executePath(turtle, nodePath, endX, endY, endZ);
+
+    //Send to the save load manager
+    SaveLoadManager.updateLocalWorld(Turtle, jsonData);
+}
 
 module.exports = { Pathfind };

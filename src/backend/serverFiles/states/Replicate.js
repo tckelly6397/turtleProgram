@@ -90,6 +90,7 @@ async function startUpTurtle(turtle) {
     await giveFuel(turtle);
 
     //Reboot the turtle so that the new world data is shown
+    await delay(2000);
     await turtle.executeAction(Turtle.Actions.REBOOTTURTLE, { "direction": "front" });
 
     //Give it a second to reboot

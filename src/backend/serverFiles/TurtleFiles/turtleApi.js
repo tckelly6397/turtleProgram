@@ -19,10 +19,10 @@ let selectedTurtle;
 //Call detect on the turtle and send the data to the frontend
 async function detectAll(Turtle) {
   let jsonData = await Turtle.detect();
-    win.webContents.send("detected", jsonData);
+  win.webContents.send("detected", jsonData);
 
-    //Send to the save load manager
-    SaveLoadManager.updateLocalWorld(Turtle, jsonData);
+  //Send to the save load manager
+  SaveLoadManager.updateLocalWorld(Turtle, jsonData);
 }
 
 //Takes in a turtle class and a turtle json and checks if equal

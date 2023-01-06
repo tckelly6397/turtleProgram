@@ -17,6 +17,7 @@ const wss = new WebSocketServer({port});;
 let turtles = [];
 let turtleList;
 let win;
+let initializeDone = false;
 
 //Display the server is running
 console.log(`Listening at ${port}...`);
@@ -25,6 +26,15 @@ console.log(`Listening at ${port}...`);
 pingTurtles();
 
 /*=========================== functions ===========================*/
+function waitFor(conditionFunction) {
+    const poll = resolve => {
+      if(conditionFunction()) resolve();
+      else setTimeout(_ => poll(resolve), 5);
+    }
+
+    return new Promise(poll);
+}
+
 //Update the local window
 function updateWin(_win) {
     win = _win;
@@ -35,6 +45,8 @@ function updateWin(_win) {
 
         //Send crafting recipes
         sendCrafting();
+
+        initializeDone = true;
     });
 }
 
@@ -120,6 +132,9 @@ function pingTurtles() {
 //When a websocket connects to the server create a new Turtle object passing in it's
 //corresponding WebSocket
 wss.on('connection', async (ws) => {
+    //Wait for all initializations to be done
+    await waitFor(_ => initializeDone === true);
+
     let turtle = new Turtle(ws);
     turtles.push(turtle);
 
