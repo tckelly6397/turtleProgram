@@ -5,6 +5,7 @@
 */
 
 /*=========================== Imports ===========================*/
+const { Console } = require('console');
 const fs = require('fs');
 
 /*=========================== Variables ===========================*/
@@ -152,6 +153,7 @@ function updateLocalWorld(Turtle, blocks) {
     updateTurtle(Turtle);
 }
 
+//Given a turtle, update turtle data
 function updateTurtle(Turtle) {
     //Get reference to location of turtle data
     let turtleIndex = getTurtleIndex(Turtle);
@@ -160,6 +162,7 @@ function updateTurtle(Turtle) {
     turtleList[turtleIndex] = Turtle.getTurtleData();
 }
 
+//Given a turtle label and id, return the corresponding data
 function getTurtleIndexByLabel(label, id) {
     for(let i = 0; i < turtleList.length; i++) {
         let turtleData = turtleList[i];
@@ -170,6 +173,7 @@ function getTurtleIndexByLabel(label, id) {
     }
 }
 
+//Update a turtleData given a turtleData
 function updateTurtleByData(turtleData) {
     //Get reference to location of turtle data
     let turtleIndex = getTurtleIndexByLabel(turtleData.label, turtleData.computerId);
@@ -195,6 +199,8 @@ async function saveWorld(worldName, worldData) {
     if(worldData.length == 0) {
         return;
     }
+
+    console.log("Saving " + worldName + " data.");
     await fs.writeFileSync(worldsDir + worldName, JSON.stringify(worldData), (err) => {
         return null;
     });
@@ -202,6 +208,7 @@ async function saveWorld(worldName, worldData) {
 
 //Saves all the worlds in the map as well as the saves the turtleList
 async function saveWorlds() {
+    console.log("Saving all...");
     for (let [key, value] of LocalWorldMap) {
         await saveWorld(key, value);
     }

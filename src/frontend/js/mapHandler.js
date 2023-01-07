@@ -178,6 +178,14 @@ addEventListener('mousedown', (event) => {
             document.getElementById("block-info-area").innerText = "Block: " + block.name;
         }
 
+        if(block != undefined && event.button == 2) {
+            let data = {
+                "state": "pathfindClick",
+                "args": {"x": block.x, "y": block.y, "z": block.z, "canMine": true}
+            }
+            window.api.send("frontState", JSON.stringify(data));
+        }
+
         //Set target to block on middle click
         if(event.button == 1) {
             scene.updateMatrixWorld(true);

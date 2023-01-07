@@ -82,6 +82,27 @@ async function placeAction(action) {
   .catch(console.error);
 }
 
+async function askPathfind(x, y, z, canMine) {
+  prompt({
+    title: 'Place block',
+    label: 'Coords',
+    value: `{ "x": ${x}, "y": ${y}, "z": ${z}, "canMine": ${canMine}}`,
+    inputAttrs: {
+        type: 'name'
+    },
+    type: 'input'
+  })
+  .then(async (r) => {
+    if(r === null) {
+        console.log('user cancelled');
+    } else {
+        let data = JSON.parse(r);
+        await Pathfind.Pathfind(selectedTurtle, data.x, data.y, data.z, win, data.canMine);
+    }
+  })
+  .catch(console.error);
+}
+
 //Updates the turtle data as well as sends the turtle data to the front end
 async function updateData() {
   //Update the slot
@@ -158,7 +179,11 @@ ipcMain.on("frontState", async (event, args) => {
   } else if(state == 'replicate') {
     await Replicate.Replicate(selectedTurtle);
   } else if(state == 'pathfind') {
-    await Pathfind.Pathfind(selectedTurtle, 1, 0, -9, win);
+    //Don't mine
+    //Move to specified path
+    await Pathfind.Pathfind(selectedTurtle, 1, 0, -9, win, false);
+  } else if(state == 'pathfindClick') {
+    await askPathfind(argument.x, argument.y, argument.z, argument.canMine);
   }
 
   var endTime = performance.now();

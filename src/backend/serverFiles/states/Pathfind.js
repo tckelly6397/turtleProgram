@@ -1,10 +1,11 @@
 const SaveLoadManager = require("../TurtleFiles/SaveLoadManager.js");
 const Turtle = require("../TurtleFiles/Turtle.js");
-const { Heap } = require('heap-js');
+const { Heap } = require("heap-js");
+const TurtleUtil = require("../TurtleFiles/TurtleUtil.js");
 
 let win;
 
-//Converts data to something readable by the Math.distance function
+//Gets the distance between xyz coordinates
 function distancePos(x1, y1, z1, x2, y2, z2) {
     let deltaX = x2 - x1;
     let deltaY = y2 - y1;
@@ -17,65 +18,6 @@ function distancePos(x1, y1, z1, x2, y2, z2) {
 //Get the distance between two nodes
 function distanceNodes(node1, node2) {
     return distancePos(node1.x, node1.y, node1.z, node2.x, node2.y, node2.z);
-}
-
-//Gets the begin node defaulting gCost to 0
-function getBeginNode(x, y, z, endX, endY, endZ) {
-    let gCost = 0;
-    let hCost = distancePos(x, y, z, endX, endY, endZ);
-
-    let node = {
-        "x": x,
-        "y": y,
-        "z": z,
-        "parent": "",
-        "gCost": gCost,
-        "hCost": hCost,
-        "fCost": (() => { return this.gCost + this.hCost })
-    }
-
-    return node;
-}
-
-//Gets the end node defaulting hCost to 0
-function getEndNode(x, y, z, beginX, beginY, beginZ) {
-    let gCost = distancePos(x, y, z, beginX, beginY, beginZ);
-    let hCost = 0;
-
-    let node = {
-        "x": x,
-        "y": y,
-        "z": z,
-        "parent": "",
-        "gCost": gCost,
-        "hCost": hCost,
-        "fCost": (() => { return this.gCost + this.hCost })
-    }
-
-    return node;
-}
-
-
-//Check if two nodes are equal
-function isNodesEqual(node1, node2) {
-
-    if(node1.x == node2.x && node1.y == node2.y && node1.z == node2.z) {
-        return true;
-    }
-
-    return false;
-}
-
-function getBlockInMap(x, y, z, map) {
-    for(let i = 0; i < map.length; i++) {
-        let block = map[i];
-
-        if(block.x == x && block.y == y && block.z == z) {
-            return false;
-        }
-    }
-
-    return true;
 }
 
 //Gets a node, given a position and the begin as well as the end node
@@ -93,52 +35,87 @@ function makeNode(x, y, z) {
     return node;
 }
 
-//If there is a node then add it to the list of neighbors
-function addNodeFromMap(x, y, z, map, neighborList, beginNode, endNode) {
-    for(let i = 0; i < neighborList.length; i++) {
-        let neighbor = neighborList[i];
+//Check if two nodes are equal
+function isNodesEqual(node1, node2) {
+
+    if(node1.x == node2.x && node1.y == node2.y && node1.z == node2.z) {
+        return true;
+    }
+
+    return false;
+}
+
+//Gets a block from a given list of blocks given coordinates
+function getBlockInMap(x, y, z, map, canMine) {
+    for(let i = 0; i < map.length; i++) {
+        let block = map[i];
+
+        if(block.x == x && block.y == y && block.z == z) {
+            if(canMine && TurtleUtil.excludeBlockFilter.indexOf(block.name) != -1) {
+                return false;
+            } else if(canMine && TurtleUtil.excludeBlockFilter.indexOf(block.name) == -1) {
+                return true;
+            }
+
+            return false;
+        }
+    }
+
+    return true;
+}
+
+//Gets a node from a list given coordinates
+function getNodeFromListGivenCoords(x, y, z, list) {
+    for(let i = 0; i < list.length; i++) {
+        let neighbor = list[i];
 
         if(neighbor.x == x && neighbor.y == y && neighbor.z == z) {
             return neighbor;
         }
     }
 
-    //If there is not a block then add it
-    if(getBlockInMap(x, y, z, map)) {
-        return makeNode(x, y, z, beginNode, endNode);
+    return false;
+}
+
+//If there is a node then add it to the list of neighbors
+function addNodeFromList(x, y, z, map, neighborList, canMine) {
+    let neighbor = getNodeFromListGivenCoords(x, y, z, neighborList);
+
+    //If a neighbor was found then return it
+    if(neighbor != false) {
+        return neighbor;
+    }
+
+    //If there is not a block then create it, the reason for this is because if there is a node in the map that means there
+    //is a block there so the turtle shouldn't try to move through it
+    if(getBlockInMap(x, y, z, map, canMine)) {
+        return makeNode(x, y, z);
     }
 }
 
 //Get a list of neighbors
-function getOpenNeighborsOfNode(current, map, neighborList, beginNode, endNode) {
+function getOpenNeighborsOfNode(current, map, neighborList, canMine) {
     let neighbors = [];
     let x = current.x;
     let y = current.y;
     let z = current.z;
 
-    //HORRENDOUS CODE
-    let node1 = addNodeFromMap(x + 1, y, z, map, neighborList, beginNode, endNode);
-    if(node1 != undefined)
-        neighbors.push(node1);
-    let node2 = addNodeFromMap(x - 1, y, z, map, neighborList, beginNode, endNode);
-    if(node2 != undefined)
-        neighbors.push(node2);
-    let node3 = addNodeFromMap(x, y + 1, z, map, neighborList, beginNode, endNode);
-    if(node3 != undefined)
-        neighbors.push(node3);
-    let node4 = addNodeFromMap(x, y - 1, z, map, neighborList, beginNode, endNode);
-    if(node4 != undefined)
-        neighbors.push(node4);
-    let node5 = addNodeFromMap(x, y, z + 1, map, neighborList, beginNode, endNode);
-    if(node5 != undefined)
-        neighbors.push(node5);
-    let node6 = addNodeFromMap(x, y, z - 1, map, neighborList, beginNode, endNode);
-    if(node6 != undefined)
-        neighbors.push(node6);
+    //A LITTLE BIT LESS HORRENDOUS CODE
+    let xList = [1, -1, 0, 0, 0, 0];
+    let yList = [0, 0, 1, -1, 0, 0];
+    let zList = [0, 0, 0, 0, 1, -1];
+    for(let i = 0; i < 6; i++) {
+        let node = addNodeFromList(x + xList[i], y + yList[i], z + zList[i], map, neighborList, canMine);
+        if(node != undefined) {
+            neighbors.push(node);
+        }
+    }
 
     return neighbors;
 }
 
+//Get the node list because the path is carried within the parents form the end to the begin node, then reverse the list so that
+//you can get the order in which to execute actions
 function getPath(beginNode, endNode) {
     let path = [];
     let current = endNode;
@@ -195,71 +172,77 @@ async function rotateToPositionZ(turtle, deltaZ) {
     }
 }
 
-//Call detect on the turtle and send the data to the frontend
-async function detectAll(turtle) {
-    let jsonData = await turtle.detect();
-    win.webContents.send("detected", jsonData);
+//Move the turtle and if it's allowed to mine try to dig and then move if the turtle hasn't initially moved
+async function move(turtle, action, canMine) {
+    let moved = await turtle.executeAction(action);
 
-    //Send to the save load manager
-    SaveLoadManager.updateLocalWorld(turtle, jsonData);
+    //If it's allowed to mine and it hasn't moved then mine
+    if(canMine && moved == false) {
+        SaveLoadManager.updateLocalWorld(turtle, await TurtleUtil.detectAll(turtle, win));
+        await TurtleUtil.dig(turtle, action, false, win);
+        moved = await turtle.executeAction(action);
+    }
+
+    return moved;
 }
 
-async function moveToNode(turtle, node) {
+//Given a turtle and a node to move to, execute the correct turtle function to move to that node
+async function moveToNode(turtle, node, canMine) {
     let deltaX = node.x - turtle.position.x;
     let deltaY = node.y - turtle.position.y;
     let deltaZ = node.z - turtle.position.z;
 
-    //Move on y axis
+    //Move on y axis if the node position is changed on the y axis
     if(deltaY == 1) {
-        let moved = await turtle.executeAction(Turtle.Actions.UP);
-        return moved;
+        return await move(turtle, Turtle.Actions.UP, canMine);
     } else if(deltaY == -1) {
-        let moved = await turtle.executeAction(Turtle.Actions.DOWN);
-        return moved;
+        return await move(turtle, Turtle.Actions.DOWN, canMine);
     }
 
+    //Rotate on the corresponding axis given it's change in position
     if(deltaX == 1 || deltaX == -1) {
-        //Rotate
         await rotateToPositionX(turtle, deltaX);
-        //Move
-        let moved = await turtle.executeAction(Turtle.Actions.FORWARD);
-        return moved;
     }
-
     if(deltaZ == 1 || deltaZ == -1) {
-        //Rotate
         await rotateToPositionZ(turtle, deltaZ);
-        //Move
-        let moved = await turtle.executeAction(Turtle.Actions.FORWARD);
-        return moved;
     }
 
-    return true;
+    //Must be the first node
+    if(deltaX == 0 && deltaY == 0 && deltaZ == 0) {
+        return true;
+    }
+
+    //Move
+    return await move(turtle, Turtle.Actions.FORWARD, canMine);
 }
 
 //Execute actions given a path
 //Each node should be one away from the current turtles position
-async function executePath(turtle, path, endX, endY, endZ) {
+async function executePath(turtle, path, endX, endY, endZ, canMine) {
 
+    //Loop through the path
     for(let i = 0; i < path.length; i++) {
         let node = path[i];
 
-        let moved = await moveToNode(turtle, node);
+        //Try to move to the node
+        let moved = await moveToNode(turtle, node, canMine);
 
+        //If the turtle moved into a block then detect the new blocks and find a new path
         if(moved == false) {
-            await detectAll(turtle);
-            await Pathfind(turtle, endX, endY, endZ, win);
+            await TurtleUtil.detectAll(turtle, win);
+            await Pathfind(turtle, endX, endY, endZ, win, canMine);
             return;
         }
 
+        //Update the turtle data and send it to the front end
         SaveLoadManager.updateTurtle(turtle);
         win.webContents.send("updateTurtleData", JSON.stringify(turtle.getTurtleData()));
     }
 }
 
-async function Pathfind(turtle, endX, endY, endZ, win_) {
+async function Pathfind(turtle, endX, endY, endZ, win_, canMine) {
+    let startTime = performance.now();
     win = win_;
-    let startTime = performance.now()
     let beginX = turtle.position.x;
     let beginY = turtle.position.y;
     let beginZ = turtle.position.z;
@@ -269,29 +252,40 @@ async function Pathfind(turtle, endX, endY, endZ, win_) {
     let openList = new Heap(customComparator);
     let closedList = [];
     let neighborList = [];
-
+    //Needed so the turtle knows where blocks are
     let map = SaveLoadManager.LocalWorldMap.get(turtle.mapLocation);
 
     //Initialize nodes and list
-    let beginNode = getBeginNode(beginX, beginY, beginZ, endX, endY, endZ);
-    let endNode = getEndNode(endX, endY, endZ, beginX, beginY, beginZ);
+    let beginEndDistance = distancePos(beginX, beginY, beginZ, endX, endY, endZ);
+
+    let beginNode = makeNode(beginX, beginY, beginZ);
+    beginNode.hCost = beginEndDistance;
     openList.add(beginNode);
 
+    let endNode = makeNode(endX, endY, endZ);
+    endNode.gCost = beginEndDistance;
+
+    //Run the algorithm
     while(openList.length > 0) {
+        //The node with the lowest fCost
         let current = openList.pop();
 
+        //Add it to the closed list
         closedList.push(current);
 
+        //Check if they're at equal positions
         if(isNodesEqual(current, endNode)) {
             endNode = current;
             break;
         }
 
-        let neighbors = getOpenNeighborsOfNode(current, map, neighborList, beginNode, endNode);
+        //Look through the neighbors
+        let neighbors = getOpenNeighborsOfNode(current, map, neighborList, canMine);
         for(let i = 0; i < neighbors.length; i++) {
             let neighbor = neighbors[i];
             neighborList.push(neighbor);
 
+            //If the neighbor is inside of the closed list then go to next neighbor
             if(closedList.indexOf(neighbor) != -1) {
                 continue;
             }
@@ -316,10 +310,17 @@ async function Pathfind(turtle, endX, endY, endZ, win_) {
     console.log(`finding the path took ${endTime - startTime} milliseconds`);
 
     //Make the turtle move
-    await executePath(turtle, nodePath, endX, endY, endZ);
+    await executePath(turtle, nodePath, endX, endY, endZ, canMine);
 
     //Send to the save load manager
     SaveLoadManager.updateTurtle(turtle);
 }
 
 module.exports = { Pathfind };
+
+//How to optimize more
+//Split the beginPosition through endPosition into parts by making educated guesses
+//This would allow the turtle to move more and think less, getting closer to the position and requiring less thinking
+//This would be less precise
+
+//Keep track of which blocks were placed by turtles, if it was not placed by a turtle then the turtle can mine it.
