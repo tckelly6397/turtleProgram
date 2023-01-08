@@ -1,10 +1,13 @@
+/*=========================== Imports ===========================*/
 const SaveLoadManager = require("../TurtleFiles/SaveLoadManager.js");
 const Turtle = require("../TurtleFiles/Turtle.js");
 const { Heap } = require("heap-js");
 const TurtleUtil = require("../TurtleFiles/TurtleUtil.js");
 
+/*=========================== Variables ===========================*/
 let win;
 
+/*=========================== Functions ===========================*/
 //Gets the distance between xyz coordinates
 function distancePos(x1, y1, z1, x2, y2, z2) {
     let deltaX = x2 - x1;

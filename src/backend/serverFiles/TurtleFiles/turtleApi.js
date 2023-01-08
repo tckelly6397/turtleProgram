@@ -43,7 +43,7 @@ function syncWorld() {
     "turtle": selectedTurtle.getTurtleData()
   }
 
-  win.webContents.send("backSynchWorldData", newData);
+  win.webContents.send("backSyncWorldData", newData);
 }
 
 //Update the window
@@ -166,14 +166,19 @@ ipcMain.on("frontState", async (event, args) => {
   let state = data.state;
   let argument = data.args;
 
+  console.log(args);
+  console.log(data);
+  console.log(state);
+  console.log(argument);
+
   var startTime = performance.now()
 
   if(state == 'suck') {
     await Suck.SuckAll(selectedTurtle, argument);
   } else if(state == 'drop') {
     //await Drop.DropAllFilter(selectedTurtle, argument, ["minecraft:dirt", "minecraft:stone"]); //["minecraft:dirt"]
-    //await Drop.DropAll(selectedTurtle, argument);
-    await Drop.DropSlots(selectedTurtle, argument, Drop.DefinedSlots.SideSlots);
+    await Drop.DropAll(selectedTurtle, argument);
+    //await Drop.DropSlots(selectedTurtle, argument, Drop.DefinedSlots.SideSlots);
   } else if(state == 'transfer') {
     await TransferItems.TransferItems(selectedTurtle, TransferItems.DefinedSlots.SideSlots);
   } else if(state == 'replicate') {
@@ -184,21 +189,14 @@ ipcMain.on("frontState", async (event, args) => {
     await Pathfind.Pathfind(selectedTurtle, 1, 0, -9, win, false);
   } else if(state == 'pathfindClick') {
     await askPathfind(argument.x, argument.y, argument.z, argument.canMine);
+  } else if(state == 'craft') {
+    await Craft.Craft(selectedTurtle, argument, 64);
   }
 
   var endTime = performance.now();
   console.log(`state ${state} took ${endTime - startTime} milliseconds`);
 
   win.webContents.send("updateTurtleData", JSON.stringify(selectedTurtle.getTurtleData()));
-});
-
-ipcMain.on("frontExecuteCraft", async (event, args) => {
-  var startTime = performance.now()
-
-  await Craft.Craft(selectedTurtle, args, 64);
-
-  var endTime = performance.now();
-  console.log(`craft ${args} took ${endTime - startTime} milliseconds`);
 });
 
 module.exports = { updateWin };

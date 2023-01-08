@@ -1,6 +1,10 @@
+/*=========================== Imports ===========================*/
 const Turtle = require("../TurtleFiles/Turtle.js");
 const SaveLoadManager = require("../TurtleFiles/SaveLoadManager.js");
 
+/*=========================== Variables ===========================*/
+
+/*=========================== Functions ===========================*/
 function delay(time) {
     return new Promise(resolve => setTimeout(resolve, time));
 }

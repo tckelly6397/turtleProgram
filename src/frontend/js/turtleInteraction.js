@@ -39,7 +39,7 @@ window.api.receive("updateTurtleData", (turtle) => {
 });
 
 //Get the world data
-window.api.receive("backSynchWorldData", (data) => {
+window.api.receive("backSyncWorldData", (data) => {
     MapHandler.updateWorld(data.turtle, data.blocks);
     updateTurtle(data.turtle);
 });
@@ -86,7 +86,12 @@ window.api.receive("backSendRecipeLocations", (data) => {
         let element = document.createElement("a");
         element.classList.add("dropdown-item");
         element.innerText = key
-        let clickCommand = "window.api.send(\"frontExecuteCraft\", \"" + key + "\");"
+        let keyData = {
+            "state": "craft",
+            "args": `${key}`
+        }
+        let stringData = JSON.stringify(keyData);
+        let clickCommand = "window.api.send(\"frontState\", \'" + stringData + "\');"
         element.setAttribute("onclick", clickCommand);
         craftingList.appendChild(element);
     }

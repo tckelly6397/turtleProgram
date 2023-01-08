@@ -1,10 +1,13 @@
+/*=========================== Imports ===========================*/
 const Turtle = require('../TurtleFiles/Turtle.js');
 
+/*=========================== Variables ===========================*/
 //Defined slots presets
 const DefinedSlots = {
     "SideSlots": [4, 8, 12, 13, 14, 15, 16]
 }
 
+/*=========================== Functions ===========================*/
 //direction: Up Down Forward
 async function DropAll(turtle, direction) {
     for(let i = 0; i < 16; i++) {

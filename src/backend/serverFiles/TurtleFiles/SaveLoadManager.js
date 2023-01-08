@@ -5,7 +5,6 @@
 */
 
 /*=========================== Imports ===========================*/
-const { Console } = require('console');
 const fs = require('fs');
 
 /*=========================== Variables ===========================*/
@@ -51,12 +50,12 @@ function updateTurtleList() {
 }
 
 //Gets the data in turtleList corresponding to the passed in turtle
-function getTurtleIndex(Turtle) {
+function getTurtleIndex(turtle) {
 
     for(let i = 0; i < turtleList.length; i++) {
         let turtleData = turtleList[i];
 
-        if(isTurtlesEqual(Turtle, turtleData)) {
+        if(isTurtlesEqual(turtle, turtleData)) {
             return i;
         }
     }
@@ -116,8 +115,8 @@ function removeBlock(worldName, x, y, z) {
 }
 
 //Reads in a file location and sets the local world data to the corresponding data
-function loadLocalWorld(Turtle) {
-    let worldName = Turtle.mapLocation;
+function loadLocalWorld(turtle) {
+    let worldName = turtle.mapLocation;
 
     //If the world data isn't already found then add it to the map
     if(LocalWorldMap.get(worldName) == undefined) {
@@ -135,8 +134,8 @@ function loadLocalWorld(Turtle) {
 //Takes in a list of blocks and updates the world data with those blocks
 //If the block is air then remove the block from the world data
 //Else add it to the local world data
-function updateLocalWorld(Turtle, blocks) {
-    let worldName = Turtle.mapLocation;
+function updateLocalWorld(turtle, blocks) {
+    let worldName = turtle.mapLocation;
     blocks = JSON.parse(blocks);
 
     for(let i = 0; i < blocks.length; i++) {
@@ -150,16 +149,16 @@ function updateLocalWorld(Turtle, blocks) {
         }
     }
 
-    updateTurtle(Turtle);
+    updateTurtle(turtle);
 }
 
 //Given a turtle, update turtle data
-function updateTurtle(Turtle) {
+function updateTurtle(turtle) {
     //Get reference to location of turtle data
-    let turtleIndex = getTurtleIndex(Turtle);
+    let turtleIndex = getTurtleIndex(turtle);
 
     //Update the turtle data
-    turtleList[turtleIndex] = Turtle.getTurtleData();
+    turtleList[turtleIndex] = turtle.getTurtleData();
 }
 
 //Given a turtle label and id, return the corresponding data
@@ -221,9 +220,12 @@ async function saveWorlds() {
 /*
 * Very useful for saving any turtle
 */
-function saveTurtle(Turtle) {
-    saveWorld(Turtle.mapLocation, LocalWorldMap.get(Turtle.mapLocation));
-    updateTurtle(Turtle);
+function saveTurtle(turtle) {
+    console.log("Saving " + turtle.label + " data");
+    saveWorld(turtle.mapLocation, LocalWorldMap.get(turtle.mapLocation));
+    updateTurtle(turtle);
+
+    //Writes it to the file
     updateTurtleList();
 }
 
@@ -237,8 +239,8 @@ module.exports = { initialize, update, updateTurtle, updateLocalWorld, saveWorld
 //Usage
 //initialize(list): read in the turtle list and apply it to the local list as well as loading in the local world map data
 //update(turtle): takes in a turtleJSON and updates its map data
-//updateTurtle(Turtle): Update the local turtle json data
-//updateLocalWorld(Turtle, blocks): Updates the local world data and turtle data
+//updateTurtle(turtle): Update the local turtle json data
+//updateLocalWorld(turtle, blocks): Updates the local world data and turtle data
 //saveWorlds(): Saves all the worlds and turtles data
 
 //Call initialize on startup

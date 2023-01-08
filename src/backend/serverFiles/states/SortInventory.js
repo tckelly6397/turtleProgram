@@ -1,7 +1,11 @@
+/*=========================== Imports ===========================*/
 const Drop = require('./Drop.js');
 const Suck = require('./Suck.js');
 const Turtle = require('../TurtleFiles/Turtle.js');
 
+/*=========================== Variables ===========================*/
+
+/*=========================== Functions ===========================*/
 //Maybe check if chest is already in front and if so don't place chest?
 //Edge case: If the chest in front already has items this will break the algorithm
 async function tryToPlaceChest(turtle) {

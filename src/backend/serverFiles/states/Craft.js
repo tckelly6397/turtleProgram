@@ -17,15 +17,18 @@ Craft:
 	Dig chest
 */
 
+/*=========================== Imports ===========================*/
 const fs = require('fs');
 const Drop = require('./Drop.js');
 const SortInventory = require('./SortInventory.js');
 const TransferItems = require('./TransferItems.js');
 const Turtle = require('../TurtleFiles/Turtle.js');
 
+/*=========================== Variables ===========================*/
 //Location of recipes
 const recipeDir = "./src/backend/resources/Crafting-Recipes/";
 
+/*=========================== Functions ===========================*/
 //A map of item names to recipe location
 const recipeLocations = {
 	"computer_normal": recipeDir + "computer.json",
@@ -173,7 +176,7 @@ async function tryToPlaceChest(turtle) {
 	let selectChest = await turtle.selectItemByName("minecraft:chest");
 	if(selectChest == false) {
 		console.log("Chest not found.");
-		return;
+		return false;
 	}
 
 	//Try to place the chest
@@ -182,6 +185,8 @@ async function tryToPlaceChest(turtle) {
 		await turtle.executeAction(Turtle.Actions.DIGFORWARD);
 		await turtle.executeAction(Turtle.Actions.PLACEFORWARD);
 	}
+
+	return true;
 }
 
 function getMaxCraft(amount, keyData, inventory) {
@@ -225,7 +230,11 @@ async function Craft(turtle, name, amount) {
 	let recipeData = await loadRecipe(name);
 
 	//Place Chest
-	await tryToPlaceChest(turtle);
+	let chestPlaced = await tryToPlaceChest(turtle);
+	if(chestPlaced == false) {
+		console.log("Cancelling craft...");
+		return false;
+	}
 
 	//Holds all the sorted data of the recipe
 	let keyData = getKeyDataList(recipeData);

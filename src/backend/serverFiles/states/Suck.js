@@ -1,3 +1,8 @@
+/*=========================== Imports ===========================*/
+
+/*=========================== Variables ===========================*/
+
+/*=========================== Functions ===========================*/
 //direction: Up Down Forward
 async function SuckAll(turtle, direction) {
     for(let i = 0; i < 16; i++) {

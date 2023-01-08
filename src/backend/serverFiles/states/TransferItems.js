@@ -1,10 +1,13 @@
+/*=========================== Imports ===========================*/
 const Turtle = require('../TurtleFiles/Turtle.js');
 
+/*=========================== Variables ===========================*/
 //Defined slots presets
 const DefinedSlots = {
     "SideSlots": [4, 8, 12, 13, 14, 15, 16]
 }
 
+/*=========================== Functions ===========================*/
 async function transfer(turtle, slot, amount) {
     //Define the arguments by removing an index from the empty slots and stating a max amount to transfer
     let args = {
