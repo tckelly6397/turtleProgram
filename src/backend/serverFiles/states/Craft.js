@@ -28,7 +28,6 @@ const Turtle = require('../TurtleFiles/Turtle.js');
 //Location of recipes
 const recipeDir = "./src/backend/resources/Crafting-Recipes/";
 
-/*=========================== Functions ===========================*/
 //A map of item names to recipe location
 const recipeLocations = {
 	"computer_normal": recipeDir + "computer.json",
@@ -44,6 +43,8 @@ const recipeLocations = {
 	"oak_planks": recipeDir + "oak_planks.json",
 	"sticks": recipeDir + "sticks.json"
 }
+
+/*=========================== Functions ===========================*/
 
 //Get the minimum number from the list
 function getMin(list) {

@@ -29,6 +29,7 @@ https://pastebin.com/maY5fQmM
 
 ## ToDo
 ### Basics
+-Implement exceptions\
 -Error handling
 
 ### Advanced

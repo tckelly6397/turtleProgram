@@ -234,7 +234,22 @@ function getWorldData(worldName) {
     return LocalWorldMap.get(worldName);
 }
 
-module.exports = { initialize, update, updateTurtle, updateLocalWorld, saveWorlds, saveTurtle, getWorldData, getTurtleDataByLabel, updateTurtleByData, updateTurtleList, LocalWorldMap };
+//Get a block given a coordiante and a map
+function getBlock(x, y, z, map) {
+    for(let i = 0; i < map.length; i++) {
+        let block = map[i];
+
+        let checkX = x + Math.round(Math.cos(turtle.rotation * (Math.PI/180)));
+        let checkY = y;
+        let checkZ = z + Math.round(Math.sin(turtle.rotation * (Math.PI/180)));
+
+        if(block.x == checkX && block.y == checkY && block.z == checkZ) {
+            return block;
+        }
+    }
+}
+
+module.exports = { initialize, update, updateTurtle, updateLocalWorld, saveWorlds, saveTurtle, getWorldData, getTurtleDataByLabel, updateTurtleByData, updateTurtleList, getBlock, LocalWorldMap };
 
 //Usage
 //initialize(list): read in the turtle list and apply it to the local list as well as loading in the local world map data

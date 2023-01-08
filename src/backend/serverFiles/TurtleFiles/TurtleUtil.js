@@ -51,13 +51,13 @@ async function dig(turtle, action, overrideBlockFilter, win) {
     let deltaZ = 0;
 
     //Apply the corresponding dig action
-    if(action == Turtle.Actions.UP) {
+    if(action == Turtle.Actions.UP || action == Turtle.Actions.DIGUP) {
         digAction = Turtle.Actions.DIGUP;
         deltaY = 1;
-    } else if(action == Turtle.Actions.DOWN) {
+    } else if(action == Turtle.Actions.DOWN || action == Turtle.Actions.DIGDOWN) {
         digAction = Turtle.Actions.DIGDOWN;
         deltaY = -1;
-    } else if(action == Turtle.Actions.FORWARD) {
+    } else if(action == Turtle.Actions.FORWARD || action == Turtle.Actions.DIGFORWARD) {
         digAction = Turtle.Actions.DIGFORWARD;
         deltaX = Math.round(Math.cos(turtle.rotation * (Math.PI/180)));
         deltaZ = Math.round(Math.sin(turtle.rotation * (Math.PI/180)))
@@ -79,8 +79,9 @@ async function dig(turtle, action, overrideBlockFilter, win) {
     }
 
     //If it made it past the filter then dig
-    await turtle.executeAction(digAction);
+    let didDig = await turtle.executeAction(digAction);
     SaveLoadManager.updateLocalWorld(turtle, await detectAll(turtle, win));
+    return didDig;
 }
 
 module.exports = { excludeBlockFilter, detectAll, dig };

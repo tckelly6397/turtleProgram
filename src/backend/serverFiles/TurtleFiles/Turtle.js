@@ -128,12 +128,7 @@ class Turtle {
     //Takes in a action name and optional arguments
     //Executes the action
     async executeAction(action, args) {
-        var startTime = performance.now()
-
         let data = await this.actionMap[action](args);
-
-        var endTime = performance.now();
-        //console.log(`action ${action} took ${endTime - startTime} milliseconds`)
 
         return data;
     }
