@@ -42,6 +42,10 @@ controls.dampingFactor = 0.2;
 const light = new THREE.AmbientLight( 0xffffff ); // soft white light
 scene.add( light );
 
+/*=========================== Helper Setup ===========================*/
+const axesHelper = new THREE.AxesHelper( 5 );
+scene.add( axesHelper );
+
 /*=========================== Turtle Object Setup ===========================*/
 turtleObj = new THREE.Object3D();
 let loader = new GLTFLoader();

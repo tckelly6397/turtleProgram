@@ -10,6 +10,7 @@ const TransferItems = require('../states/TransferItems.js');
 const Craft = require('../states/Craft.js');
 const Replicate = require('../states/Replicate.js');
 const Pathfind = require('../states/Pathfind.js');
+const BuildSelection = require('../states/BuildSelection.js');
 
 /*=========================== Variables ===========================*/
 let win;
@@ -103,6 +104,29 @@ async function askPathfind(x, y, z, canMine) {
   .catch(console.error);
 }
 
+async function getInputString(title, label) {
+  let response;
+  await prompt({
+    title: title,
+    label: label,
+    value: '',
+    inputAttrs: {
+        type: 'name'
+    },
+    type: 'input'
+  })
+  .then(async (r) => {
+    if(r === null) {
+        console.log('user cancelled');
+    } else {
+        response = r;
+    }
+  })
+  .catch(console.error);
+
+  return response;
+}
+
 //Updates the turtle data as well as sends the turtle data to the front end
 async function updateData() {
   //Update the slot
@@ -191,12 +215,24 @@ ipcMain.on("frontState", async (event, args) => {
     await askPathfind(argument.x, argument.y, argument.z, argument.canMine);
   } else if(state == 'craft') {
     await Craft.Craft(selectedTurtle, argument, 64);
+  } else if(state == 'build') {
+    //await BuildSelection.Build(selectedTurtle, argument);
+    await BuildSelection.Build(selectedTurtle, await getInputString("Selection name", "name"));
   }
 
   var endTime = performance.now();
   console.log(`state ${state} took ${endTime - startTime} milliseconds`);
 
   win.webContents.send("updateTurtleData", JSON.stringify(selectedTurtle.getTurtleData()));
+});
+
+//Save selection
+ipcMain.on("frontSaveSelection", async (event, args) => {
+  let data = JSON.parse(args);
+
+  let name = await getInputString("Name the file", "name");
+
+  await SaveLoadManager.saveSelection(data, name, selectedTurtle.mapLocation);
 });
 
 module.exports = { updateWin };

@@ -128,7 +128,7 @@ function addObject(block) {
 
 //Get the world and update it
 //Parameter is the turtle
-export function updateWorld(turtle, initialWorld) {
+export function updateWorld(initialWorld) {
     //Remove all objects
     clearAllBlocks();
 

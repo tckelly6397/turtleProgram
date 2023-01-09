@@ -239,7 +239,10 @@ async function executePath(turtle, path, endX, endY, endZ, canMine) {
 
         //Update the turtle data and send it to the front end
         SaveLoadManager.updateTurtle(turtle);
-        win.webContents.send("updateTurtleData", JSON.stringify(turtle.getTurtleData()));
+
+        if(win != undefined) {
+            win.webContents.send("updateTurtleData", JSON.stringify(turtle.getTurtleData()));
+        }
     }
 }
 

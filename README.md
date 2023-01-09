@@ -30,7 +30,8 @@ https://pastebin.com/DGZejmGJ
 ## ToDo
 ### Basics
 -Implement exceptions\
--Error handling
+-Error handling\
+-Make blocks that turtles place have an attribtue that it was placed by a turtle
 
 ### Advanced
 -Furnace usage\
@@ -54,3 +55,4 @@ https://docs.google.com/document/d/1a4ert9upmV6r99dBzyar_n_ZdZ_TYz9vZFOH0HqIWp4/
 ![Diamonds](./images/diamonds-12-30.PNG)
 ![House](./images/house-1-2.PNG)
 ![Pathfinding](./images/pathfinding-1-6.PNG)
+![Selecting](./images/selecting-1-9.PNG)

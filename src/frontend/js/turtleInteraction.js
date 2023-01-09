@@ -40,7 +40,7 @@ window.api.receive("updateTurtleData", (turtle) => {
 
 //Get the world data
 window.api.receive("backSyncWorldData", (data) => {
-    MapHandler.updateWorld(data.turtle, data.blocks);
+    MapHandler.updateWorld(data.blocks);
     updateTurtle(data.turtle);
 });
 

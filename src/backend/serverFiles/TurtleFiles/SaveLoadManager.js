@@ -10,6 +10,7 @@ const fs = require('fs');
 /*=========================== Variables ===========================*/
 let turtleList;
 const worldsDir = './src/backend/resources/worlds/';
+const selectionDir = './src/backend/resources/selections/';
 const turtleListPath = './src/backend/resources/TurtleData/turtleList.json';
 
 //Maps a world name to local world data
@@ -249,7 +250,69 @@ function getBlock(x, y, z, map) {
     }
 }
 
-module.exports = { initialize, update, updateTurtle, updateLocalWorld, saveWorlds, saveTurtle, getWorldData, getTurtleDataByLabel, updateTurtleByData, updateTurtleList, getBlock, LocalWorldMap };
+//Save a selection
+async function saveSelection(selections, name, mapLocation) {
+    let worldData = LocalWorldMap.get(mapLocation);
+    let data = {
+        "blocks": [],
+        "blockCount": {}
+    }
+
+    //Increment by two getting the selection to make the outline of what is selected
+    for(let i = 0; i + 2 <= selections.length; i+=2) {
+        let select1 = selections[i];
+        let select2 = selections[i + 1];
+        let minX = Math.min(select1.x, select2.x);
+        let minY = Math.min(select1.y, select2.y);
+        let minZ = Math.min(select1.z, select2.z);
+        let deltaX = Math.abs(select1.x - select2.x) + 1;
+        let deltaY = Math.abs(select1.y - select2.y) + 1;
+        let deltaZ = Math.abs(select1.z - select2.z) + 1;
+
+        let offsetX = 0;
+        let offsetZ = 0;
+        for(let y = 0; y < deltaY; y++) {
+            for(let x = 0; x < deltaX; x++) {
+                for(let z = 0; z < deltaZ; z++) {
+                    let block = getBlockByPosition(worldData, x + minX + offsetX, y + minY, z + minZ + offsetZ);
+
+                    if(block == -1) {
+                        continue;
+                    }
+
+                    if(data.blocks.indexOf(block) == -1) {
+                        let blockData = {
+                            "name": block.name,
+                            "x": x,
+                            "y": y,
+                            "z": z
+                        }
+                        data.blocks.push(blockData);
+                    }
+
+                    if(data.blockCount[block.name] == undefined) {
+                        data.blockCount[block.name] = 0;
+                    }
+                    data.blockCount[block.name] += 1;
+                }
+                if(offsetZ == 0) {
+                    offsetZ = -1 * (deltaZ - 1);
+                } else {
+                    offsetZ = 0;
+                }
+            }
+            if(offsetX == 0) {
+                offsetX = -1 * (deltaX - 1);
+            } else {
+                offsetX = 0;
+            }
+        }
+    }
+
+    await fs.writeFileSync(selectionDir + name, JSON.stringify(data));
+}
+
+module.exports = { initialize, update, updateTurtle, updateLocalWorld, saveWorlds, saveTurtle, getWorldData, getTurtleDataByLabel, updateTurtleByData, updateTurtleList, getBlock, saveSelection, LocalWorldMap };
 
 //Usage
 //initialize(list): read in the turtle list and apply it to the local list as well as loading in the local world map data

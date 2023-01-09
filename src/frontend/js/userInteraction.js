@@ -9,37 +9,96 @@ let selections = [];
 let objects = [];
 
 /*=========================== Functions ===========================*/
+function getGeometryGivenTwoCoordiantes(vector1, vector2) {
+    const width = (Math.abs(vector1.x - vector2.x) + 1) * 5;
+    const height = (Math.abs(vector1.y - vector2.y) + 1) * 5;
+    const depth = (Math.abs(vector1.z - vector2.z) + 1) * 5;
+    console.log(width + " " + height + " " + depth);
+    return new THREE.BoxGeometry(width, height, depth);
+}
+
+function getMin(num1, num2) {
+    if(num1 < num2) {
+        return num1;
+    } else {
+        return num2;
+    }
+}
+
+function getMeshGivenTwoCoordinates(vector1, vector2) {
+    //Get the box geometry
+    const bGeo = getGeometryGivenTwoCoordiantes(vector1, vector2);
+
+    //Create a material applying the color and an opacity, defining its transparent
+    const bMat = new THREE.MeshBasicMaterial( {color: 'yellow' } );
+    bMat.depthTest = false;
+    bMat.transparent = true;
+    bMat.opacity = 0.7;
+
+    //Create the mesh
+    let mesh = new THREE.Mesh(bGeo, bMat);
+    let x = (getMin(vector1.x, vector2.x) + Math.abs((vector1.x - vector2.x) / 2)) * 5;
+    let y = (getMin(vector1.y, vector2.y) + Math.abs((vector1.y - vector2.y) / 2)) * 5;
+    let z = (getMin(vector1.z, vector2.z) + Math.abs((vector1.z - vector2.z) / 2)) * 5;
+
+    if(y == 0) {
+        y -= 2.5;
+    }
+
+    console.log("pos: " + x + " " + y + " " + z);
+    mesh.position.set(x, y, z);
+    mesh.renderOrder = 1;
+
+    return mesh;
+}
+
 function updateSelectVisuals() {
     //Clear the objects
     for(let i = 0; i < objects.length; i++) {
         let obj = objects[i];
         scene.remove(obj);
     }
+    objects = [];
 
     //Increment by two getting the selection to make the outline of what is selected
-    for(let i = 0; selections.length >= 1 && i < selections.length; i+=2) {
+    for(let i = 0; i + 2 <= selections.length; i+=2) {
         let selectData1 = selections[i];
         let selectData2 = selections[i + 1];
+
+        let mesh = getMeshGivenTwoCoordinates(selectData1, selectData2);
+        objects.push(mesh);
+        scene.add(mesh);
     }
 }
 
-document.getElementById("save-selection-btn").click(() => {
-    if(document.getElementById("save-selection-btn").getAttribute("data-canclick") == false) {
+document.getElementById("save-selection-btn").onclick = function() {
+    if(document.getElementById("save-selection-btn").getAttribute("data-canclick") == "false") {
         return;
     }
 
     //Save the selection
+    window.api.send("frontSaveSelection", JSON.stringify(selections));
 
     //Reset the data
     clearSelection();
-});
+};
 
-document.getElementById("clear-selection-btn").click(clearSelection());
+document.getElementById("clear-selection-btn").onclick = function() { clearSelection(); };
 
 function clearSelection() {
-    if(document.getElementById("clear-selection-btn").getAttribute("data-canclick") == false) {
+    if(document.getElementById("clear-selection-btn").getAttribute("data-canclick") == "false") {
+        console.log("cant");
         return;
     }
+
+    console.log("yes");
+
+    //Clear the objects
+    for(let i = 0; i < objects.length; i++) {
+        let obj = objects[i];
+        scene.remove(obj);
+    }
+    objects = [];
 
     //Clear the selection
     selections = [];
@@ -121,7 +180,7 @@ function handleInteractionWithBlocks(event) {
     if(object != undefined) {
         let block = getBlockByObject(object);
         if(block != undefined) {
-            document.getElementById("block-info-area").innerText = "Block: " + block.name;
+            document.getElementById("block-info-area").innerText = "Block: " + block.name + "[" + block.x + ", " + block.y + ", " + block.z + "]";
         }
 
         if(block != undefined && event.button == 2) {
@@ -154,6 +213,8 @@ function selectBlocks(event) {
         console.log("Not a valid block to select.");
         return;
     }
+
+    selections.push(block);
 
     //Set data on buttons
     let selectionButtons = document.getElementById("selection-btns").children;
