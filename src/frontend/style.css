@@ -80,16 +80,19 @@ body {
 
 #extra-container Button {
     font-size: 11.8px;
+    outline: none;
 }
 
 #dig-container Button {
     background-color: rgb(255, 0, 0);
     border-color: rgb(175, 0, 0);
+    outline: none;
 }
 
 #attack-container Button {
     background-color: rgb(233, 198, 0);
     border-color: rgb(163, 134, 2);
+    outline: none;
 }
 
 #place-container Button {
@@ -100,16 +103,19 @@ body {
 #place-name-container Button {
     background-color: rgb(20, 48, 206);
     border-color: rgb(30, 0, 114);
+    outline: none;
 }
 
 #suck-container Button {
     background-color: rgb(20, 194, 206);
     border-color: rgb(0, 114, 99);
+    outline: none;
 }
 
 #drop-container Button {
     background-color: rgb(255, 12, 255);
     border-color: rgb(114, 0, 99);
+    outline: none;
 }
 
 .btn-group {
@@ -178,4 +184,50 @@ body {
     flex-direction: column;
 
     margin-bottom: 8px;
+}
+
+#selection-btns {
+    position: absolute;
+    right: 15px;
+    bottom: 15px;
+}
+
+#selection-btns button {
+    align-items: center;
+    color: white;
+    font-size: 13px;
+    border-radius: 12px;
+    outline: none;
+
+    padding: 10px;
+    border: none;
+
+    -webkit-border-radius: 12px;
+    -moz-border-radius: 12px;
+    -ms-border-radius: 12px;
+    -o-border-radius: 12px;
+}
+
+#save-selection-btn {
+    background-color: limegreen;
+}
+
+#clear-selection-btn {
+    background-color: rgb(175, 0, 0);
+}
+
+#selection-btns button:hover {
+    filter: brightness(80%);
+    -webkit-filter: brightness(80%);
+
+    cursor: pointer;
+}
+
+#selection-btns button:active {
+    filter: brightness(60%);
+    -webkit-filter: brightness(60%);
+}
+
+.low-opacity {
+    opacity: 20%;
 }

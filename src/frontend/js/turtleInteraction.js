@@ -3,7 +3,7 @@
 */
 
 /*=========================== Imports ===========================*/
-import { scene, turtleObj, controls, camera } from './threeRenderer.js';
+import { scene, turtleObj, controls } from './threeRenderer.js';
 import * as THREE from '../../../build/three.module.js';
 import * as MapHandler from './mapHandler.js';
 
@@ -97,7 +97,7 @@ window.api.receive("backSendRecipeLocations", (data) => {
     }
 });
 
-/*=========================== Controls ===========================*/
+/*=========================== Visual Button Controls ===========================*/
 var InteractionContainers = document.getElementsByClassName('interaction-container');
 
 for(var j = 0; j < InteractionContainers.length; j++) {
@@ -121,22 +121,6 @@ for(var j = 0; j < InteractionContainers.length; j++) {
         }
     }
 }
-
-document.addEventListener('keydown', function(event) {
-    if(event.key == 'w') {
-        window.api.send("frontAction", JSON.stringify({"action": "forward", "args": ""}));
-    } else if(event.key == 'a') {
-        window.api.send("frontAction", JSON.stringify({"action": "turnLeft", "args": ""}));
-    } else if(event.key == 'd') {
-        window.api.send("frontAction", JSON.stringify({"action": "turnRight", "args": ""}));
-    } else if(event.key == 's') {
-        window.api.send("frontAction", JSON.stringify({"action": "back", "args": ""}));
-    } else if(event.key == ' ') {
-        window.api.send("frontAction", JSON.stringify({"action": "up", "args": ""}));
-    } else if(event.shiftKey) {
-        window.api.send("frontAction", JSON.stringify({"action": "down", "args": ""}));
-    }
-});
 
 /*=========================== Inventory ===========================*/
 let itemSlots = document.getElementsByClassName("item");

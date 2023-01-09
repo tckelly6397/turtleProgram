@@ -1,5 +1,5 @@
 /*=========================== Imports ===========================*/
-import { scene, camera, controls } from './threeRenderer.js';
+import { scene } from './threeRenderer.js';
 import * as THREE from '../../../build/three.module.js';
 
 /*=========================== Variables ===========================*/
@@ -9,7 +9,7 @@ const colorMap = new Map();
 /*=========================== Functions ===========================*/
 //Get the block form a object
 //If nothing found return -1
-function getBlockByObject(obj) {
+export function getBlockByObject(obj) {
 
     for(let i = 0; i < objects.length; i++) {
         let data = objects[i];
@@ -138,61 +138,3 @@ export function updateWorld(turtle, initialWorld) {
         addObject(block);
     }
 }
-
-/*=========================== Events ===========================*/
-//Side stuff
-function getIntersection(event) {
-    var mouse = new THREE.Vector2();
-    mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-    mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-
-    var raycaster = new THREE.Raycaster();
-    raycaster.setFromCamera(mouse, camera);
-
-    // calculate objects intersecting the picking ray
-    var intersects = raycaster.intersectObjects(scene.children);
-
-    if (intersects.length > 0) {
-      return intersects[0].object;
-    } else {
-        return undefined;
-    }
-}
-
-addEventListener('mousemove', (event) => {
-    let object = getIntersection(event);
-
-    if(object != undefined) {
-        document.body.style.cursor = 'pointer';
-    } else {
-        document.body.style.cursor = 'default';
-    }
-});
-
-addEventListener('mousedown', (event) => {
-    let object = getIntersection(event);
-
-    if(object != undefined) {
-        let block = getBlockByObject(object);
-        if(block != undefined) {
-            document.getElementById("block-info-area").innerText = "Block: " + block.name;
-        }
-
-        if(block != undefined && event.button == 2) {
-            let data = {
-                "state": "pathfindClick",
-                "args": {"x": block.x, "y": block.y, "z": block.z, "canMine": true}
-            }
-            window.api.send("frontState", JSON.stringify(data));
-        }
-
-        //Set target to block on middle click
-        if(event.button == 1) {
-            scene.updateMatrixWorld(true);
-            var position = new THREE.Vector3();
-            position.setFromMatrixPosition( object.matrixWorld );
-
-            controls.target = position;
-        }
-    }
-});

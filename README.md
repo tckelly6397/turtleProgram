@@ -14,8 +14,8 @@ three
 
 ## Turtle setup
 Paste this as startup\
-pastebin get maY5fQmM startup\
-https://pastebin.com/maY5fQmM
+pastebin get DGZejmGJ startup\
+https://pastebin.com/DGZejmGJ
 
 ## Features
 -Crafting\
