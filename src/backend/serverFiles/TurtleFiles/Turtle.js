@@ -173,7 +173,6 @@ class Turtle {
         if(isPlaced) {
             let blocks = [];
             blocks.push(await this.detectDirection(direction, true));
-            console.log(blocks);
             SaveLoadManager.updateLocalWorld(this, JSON.stringify(blocks));
             await this.updateSelectedSlot();
         }
@@ -197,7 +196,6 @@ class Turtle {
         }
 
         block["placedByTurtle"] = placedByTurtle;
-        console.log("p" + block.placedByTurtle);
         return block;
     }
 

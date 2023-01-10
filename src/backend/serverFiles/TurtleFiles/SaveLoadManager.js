@@ -262,6 +262,18 @@ function getMinFromList(list, value) {
     return min;
 }
 
+function isBlockInList(block, blocks) {
+    for(let i = 0; i < blocks.length; i++) {
+        let b = blocks[i];
+
+        if(block.x == b.x && block.y == b.y && block.z == b.z) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 //Save a selection
 async function saveSelection(selections, name, mapLocation) {
     let worldData = LocalWorldMap.get(mapLocation);
@@ -295,7 +307,7 @@ async function saveSelection(selections, name, mapLocation) {
                         continue;
                     }
 
-                    if(data.blocks.indexOf(block) == -1) {
+                    if(!isBlockInList(block, data.blocks)) {
                         let blockData = {
                             "name": block.name,
                             "x": x + minX - absMinX,

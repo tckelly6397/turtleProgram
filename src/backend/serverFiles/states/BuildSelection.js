@@ -66,7 +66,7 @@ function getLowestYFromBlocks(blocks) {
         let block = blocks[i];
 
         if(block.y < min) {
-            min = block;
+            min = block.y;
         }
     }
 
@@ -76,7 +76,6 @@ function getLowestYFromBlocks(blocks) {
 async function Build(turtle, selectionName) {
     let data = await fs.readFileSync(selectionDir + selectionName);
     data = JSON.parse(data);
-    console.log(data);
 
     let blocks = data.blocks;
     let blockCount = data.blockCount;
@@ -96,20 +95,10 @@ async function Build(turtle, selectionName) {
         await turtle.executeAction(Turtle.Actions.PLACEDOWN);
 
         const index = blocks.indexOf(block);
-        if (index > -1) {
+        if(index > -1) {
             blocks.splice(index, 1);
         }
     }
-    /*
-    for(let i = 0; i < blocks.length; i++) {
-        let block = blocks[i];
-
-        await Pathfind.Pathfind(turtle, block.x, block.y + 1, block.z, undefined, true, false);
-
-        await turtle.selectItemByName(block.name);
-        await turtle.executeAction(Turtle.Actions.PLACEDOWN);
-        //await TurtleUtil.detectAll(turtle, undefined);
-    }*/
 
     console.log("Finished building: " + selectionName);
 }
