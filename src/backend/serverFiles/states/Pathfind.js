@@ -49,7 +49,7 @@ function isNodesEqual(node1, node2) {
 }
 
 //Gets a block from a given list of blocks given coordinates
-function getBlockInMap(x, y, z, map, canMine) {
+function getBlockInMap(x, y, z, map, canMine, canMinePlacedByTurtle) {
     for(let i = 0; i < map.length; i++) {
         let block = map[i];
 
@@ -57,6 +57,12 @@ function getBlockInMap(x, y, z, map, canMine) {
             if(canMine && TurtleUtil.excludeBlockFilter.indexOf(block.name) != -1) {
                 return false;
             } else if(canMine && TurtleUtil.excludeBlockFilter.indexOf(block.name) == -1) {
+                //Check if the block was placed by a turtle
+                //If the block is there, and you can't mine blocks placed by turtles and the block is placed by a turtle then return false
+                if(block != undefined && canMinePlacedByTurtle == false && block.placedByTurtle == true) {
+                    return false;
+                }
+
                 return true;
             }
 
@@ -81,7 +87,7 @@ function getNodeFromListGivenCoords(x, y, z, list) {
 }
 
 //If there is a node then add it to the list of neighbors
-function addNodeFromList(x, y, z, map, neighborList, canMine) {
+function addNodeFromList(x, y, z, map, neighborList, canMine, canMinePlacedByTurtle) {
     let neighbor = getNodeFromListGivenCoords(x, y, z, neighborList);
 
     //If a neighbor was found then return it
@@ -91,13 +97,13 @@ function addNodeFromList(x, y, z, map, neighborList, canMine) {
 
     //If there is not a block then create it, the reason for this is because if there is a node in the map that means there
     //is a block there so the turtle shouldn't try to move through it
-    if(getBlockInMap(x, y, z, map, canMine)) {
+    if(getBlockInMap(x, y, z, map, canMine, canMinePlacedByTurtle)) {
         return makeNode(x, y, z);
     }
 }
 
 //Get a list of neighbors
-function getOpenNeighborsOfNode(current, map, neighborList, canMine) {
+function getOpenNeighborsOfNode(current, map, neighborList, canMine, canMinePlacedByTurtle) {
     let neighbors = [];
     let x = current.x;
     let y = current.y;
@@ -108,7 +114,7 @@ function getOpenNeighborsOfNode(current, map, neighborList, canMine) {
     let yList = [0, 0, 1, -1, 0, 0];
     let zList = [0, 0, 0, 0, 1, -1];
     for(let i = 0; i < 6; i++) {
-        let node = addNodeFromList(x + xList[i], y + yList[i], z + zList[i], map, neighborList, canMine);
+        let node = addNodeFromList(x + xList[i], y + yList[i], z + zList[i], map, neighborList, canMine, canMinePlacedByTurtle);
         if(node != undefined) {
             neighbors.push(node);
         }
@@ -176,13 +182,13 @@ async function rotateToPositionZ(turtle, deltaZ) {
 }
 
 //Move the turtle and if it's allowed to mine try to dig and then move if the turtle hasn't initially moved
-async function move(turtle, action, canMine) {
+async function move(turtle, action, canMine, canMinePlacedByTurtle) {
     let moved = await turtle.executeAction(action);
 
     //If it's allowed to mine and it hasn't moved then mine
     if(canMine && moved == false) {
         SaveLoadManager.updateLocalWorld(turtle, await TurtleUtil.detectAll(turtle, win));
-        await TurtleUtil.dig(turtle, action, false, win);
+        await TurtleUtil.dig(turtle, action, false, canMinePlacedByTurtle, win);
         moved = await turtle.executeAction(action);
     }
 
@@ -190,16 +196,16 @@ async function move(turtle, action, canMine) {
 }
 
 //Given a turtle and a node to move to, execute the correct turtle function to move to that node
-async function moveToNode(turtle, node, canMine) {
+async function moveToNode(turtle, node, canMine, canMinePlacedByTurtle) {
     let deltaX = node.x - turtle.position.x;
     let deltaY = node.y - turtle.position.y;
     let deltaZ = node.z - turtle.position.z;
 
     //Move on y axis if the node position is changed on the y axis
     if(deltaY == 1) {
-        return await move(turtle, Turtle.Actions.UP, canMine);
+        return await move(turtle, Turtle.Actions.UP, canMine, canMinePlacedByTurtle);
     } else if(deltaY == -1) {
-        return await move(turtle, Turtle.Actions.DOWN, canMine);
+        return await move(turtle, Turtle.Actions.DOWN, canMine, canMinePlacedByTurtle);
     }
 
     //Rotate on the corresponding axis given it's change in position
@@ -216,24 +222,24 @@ async function moveToNode(turtle, node, canMine) {
     }
 
     //Move
-    return await move(turtle, Turtle.Actions.FORWARD, canMine);
+    return await move(turtle, Turtle.Actions.FORWARD, canMine, canMinePlacedByTurtle);
 }
 
 //Execute actions given a path
 //Each node should be one away from the current turtles position
-async function executePath(turtle, path, endX, endY, endZ, canMine) {
+async function executePath(turtle, path, endX, endY, endZ, canMine, canMinePlacedByTurtle) {
 
     //Loop through the path
     for(let i = 0; i < path.length; i++) {
         let node = path[i];
 
         //Try to move to the node
-        let moved = await moveToNode(turtle, node, canMine);
+        let moved = await moveToNode(turtle, node, canMine, canMinePlacedByTurtle);
 
         //If the turtle moved into a block then detect the new blocks and find a new path
         if(moved == false) {
             await TurtleUtil.detectAll(turtle, win);
-            await Pathfind(turtle, endX, endY, endZ, win, canMine);
+            await Pathfind(turtle, endX, endY, endZ, win, canMine, canMinePlacedByTurtle);
             return;
         }
 
@@ -246,7 +252,7 @@ async function executePath(turtle, path, endX, endY, endZ, canMine) {
     }
 }
 
-async function Pathfind(turtle, endX, endY, endZ, win_, canMine) {
+async function Pathfind(turtle, endX, endY, endZ, win_, canMine, canMinePlacedByTurtle) {
     let startTime = performance.now();
     win = win_;
     let beginX = turtle.position.x;
@@ -286,7 +292,7 @@ async function Pathfind(turtle, endX, endY, endZ, win_, canMine) {
         }
 
         //Look through the neighbors
-        let neighbors = getOpenNeighborsOfNode(current, map, neighborList, canMine);
+        let neighbors = getOpenNeighborsOfNode(current, map, neighborList, canMine, canMinePlacedByTurtle);
         for(let i = 0; i < neighbors.length; i++) {
             let neighbor = neighbors[i];
             neighborList.push(neighbor);
@@ -316,7 +322,7 @@ async function Pathfind(turtle, endX, endY, endZ, win_, canMine) {
     console.log(`finding the path took ${endTime - startTime} milliseconds`);
 
     //Make the turtle move
-    await executePath(turtle, nodePath, endX, endY, endZ, canMine);
+    await executePath(turtle, nodePath, endX, endY, endZ, canMine, canMinePlacedByTurtle);
 
     //Send to the save load manager
     SaveLoadManager.updateTurtle(turtle);

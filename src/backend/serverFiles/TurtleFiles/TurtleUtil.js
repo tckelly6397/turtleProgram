@@ -43,7 +43,7 @@ function checkFilter(x, y, z, map) {
 }
 
 //Given a turtle, the action and should it abide by the exclude block filter
-async function dig(turtle, action, overrideBlockFilter, win) {
+async function dig(turtle, action, overrideBlockFilter, canMineTurtleBlocks, win) {
     let map = SaveLoadManager.LocalWorldMap.get(turtle.mapLocation);
     let digAction;
     let deltaX = 0;
@@ -75,6 +75,21 @@ async function dig(turtle, action, overrideBlockFilter, win) {
 
         if(filter == false) {
             return false;
+        }
+    }
+
+    //Check the block filter if overriding it is false
+    if(!canMineTurtleBlocks) {
+        let x = turtle.position.x + deltaX;
+        let y = turtle.position.y + deltaY;
+        let z = turtle.position.z + deltaZ;
+        let block = SaveLoadManager.getBlock(turtle, SaveLoadManager.LocalWorldMap.get(turtle.mapLocation), x, y, z);
+
+        if(block != undefined) {
+            let isTurtleBlock = block.placedByTurtle;
+            if(isTurtleBlock == true) {
+                return false;
+            }
         }
     }
 

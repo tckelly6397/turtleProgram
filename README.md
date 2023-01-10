@@ -38,7 +38,10 @@ https://pastebin.com/DGZejmGJ
 -Building blueprints\
 -Mining\
 -Tree farming\
--Hive AI
+-Hive AI\
+
+-Multi threads(So the main thread doesn't pause on execution and allow turtles to execute fatser)\
+-On WebSocket request send an id that is expected back rather than keeping a boolean to see if the turtle is busy, allows for multiple turtles to execute at once
 
 ### Extra
 -Textures\

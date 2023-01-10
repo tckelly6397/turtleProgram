@@ -98,7 +98,7 @@ async function askPathfind(x, y, z, canMine) {
         console.log('user cancelled');
     } else {
         let data = JSON.parse(r);
-        await Pathfind.Pathfind(selectedTurtle, data.x, data.y, data.z, win, data.canMine);
+        await Pathfind.Pathfind(selectedTurtle, data.x, data.y, data.z, win, data.canMine, false);
     }
   })
   .catch(console.error);
@@ -210,7 +210,7 @@ ipcMain.on("frontState", async (event, args) => {
   } else if(state == 'pathfind') {
     //Don't mine
     //Move to specified path
-    await Pathfind.Pathfind(selectedTurtle, 1, 0, -9, win, false);
+    await Pathfind.Pathfind(selectedTurtle, 1, 0, -9, win, false, false);
   } else if(state == 'pathfindClick') {
     await askPathfind(argument.x, argument.y, argument.z, argument.canMine);
   } else if(state == 'craft') {

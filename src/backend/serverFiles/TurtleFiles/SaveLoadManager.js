@@ -95,7 +95,7 @@ function addBlock(worldName, block) {
     }
 
     if(oldBlock == -1) {
-        let dataBlock = {"name": block.name, "x": block.x, "y": block.y, "z": block.z}
+        let dataBlock = {"name": block.name, "x": block.x, "y": block.y, "z": block.z, "placedByTurtle": block.placedByTurtle}
         WorldData.push(dataBlock);
     }
 }
@@ -236,7 +236,7 @@ function getWorldData(worldName) {
 }
 
 //Get a block given a coordiante and a map
-function getBlock(x, y, z, map) {
+function getBlock(turtle, map, x, y, z) {
     for(let i = 0; i < map.length; i++) {
         let block = map[i];
 
@@ -250,6 +250,18 @@ function getBlock(x, y, z, map) {
     }
 }
 
+function getMinFromList(list, value) {
+    let min = list[0][value];
+
+    for(let i = 1; i < list.length; i++) {
+        if(list[i][value] < min) {
+            min = list[i][value];
+        }
+    }
+
+    return min;
+}
+
 //Save a selection
 async function saveSelection(selections, name, mapLocation) {
     let worldData = LocalWorldMap.get(mapLocation);
@@ -258,6 +270,9 @@ async function saveSelection(selections, name, mapLocation) {
         "blockCount": {}
     }
 
+    let absMinX = getMinFromList(selections, 'x');
+    let absMinY = getMinFromList(selections, 'y');
+    let absMinZ = getMinFromList(selections, 'z');
     //Increment by two getting the selection to make the outline of what is selected
     for(let i = 0; i + 2 <= selections.length; i+=2) {
         let select1 = selections[i];
@@ -274,7 +289,7 @@ async function saveSelection(selections, name, mapLocation) {
         for(let y = 0; y < deltaY; y++) {
             for(let x = 0; x < deltaX; x++) {
                 for(let z = 0; z < deltaZ; z++) {
-                    let block = getBlockByPosition(worldData, x + minX + offsetX, y + minY, z + minZ + offsetZ);
+                    let block = getBlockByPosition(worldData, x + minX, y + minY, z + minZ);
 
                     if(block == -1) {
                         continue;
@@ -283,9 +298,9 @@ async function saveSelection(selections, name, mapLocation) {
                     if(data.blocks.indexOf(block) == -1) {
                         let blockData = {
                             "name": block.name,
-                            "x": x,
-                            "y": y,
-                            "z": z
+                            "x": x + minX - absMinX,
+                            "y": y + minY - absMinY,
+                            "z": z + minZ - absMinZ
                         }
                         data.blocks.push(blockData);
                     }

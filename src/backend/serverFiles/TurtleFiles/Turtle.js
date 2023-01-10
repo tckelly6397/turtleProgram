@@ -7,6 +7,7 @@
 const { Vector3 } = require("three");
 const fs = require('fs');
 const Item = require("./item.js");
+const SaveLoadManager = require("./SaveLoadManager.js");
 
 /*=========================== Global Constants ===========================*/
 const namesPath = './src/backend/resources/TurtleData/names.json';
@@ -170,10 +171,34 @@ class Turtle {
         let isPlaced = (await this.execute("turtle.place" + direction + "()")).callback;
 
         if(isPlaced) {
+            let blocks = [];
+            blocks.push(await this.detectDirection(direction, true));
+            console.log(blocks);
+            SaveLoadManager.updateLocalWorld(this, JSON.stringify(blocks));
             await this.updateSelectedSlot();
         }
 
         return isPlaced;
+    }
+
+    async detectDirection(direction, placedByTurtle) {
+        let inspect = (await this.execute("turtle.inspect" + direction + "()"));
+        let block;
+
+        if(direction == "Up") {
+            block = this.getBlockData(inspect, 0, 1, 0);
+        } else if(direction == "Down") {
+            block = this.getBlockData(inspect, 0, -1, 0);
+        } else if(direction == "") {
+            block = this.getBlockData(inspect, Math.round(Math.cos(this.rotation * (Math.PI/180))), 0, Math.round(Math.sin(this.rotation * (Math.PI/180))));
+        } else {
+            console.log("Invalid direction.");
+            return;
+        }
+
+        block["placedByTurtle"] = placedByTurtle;
+        console.log("p" + block.placedByTurtle);
+        return block;
     }
 
     async selectSlot(slot) {
@@ -392,8 +417,7 @@ class Turtle {
             "name": (detection.callback) ? detection.extra.name : "air",
             "x": this.position.x + xOff,
             "y": this.position.y + yOff,
-            "z": this.position.z + zOff,
-            "extra": (detection.callback) ? detection.extra : "empty"
+            "z": this.position.z + zOff
         }
     }
 }
