@@ -26,6 +26,7 @@
     "electron-prompt": "^1.7.0",
     "electron-reload": "^2.0.0-alpha.1",
     "heap-js": "^2.2.0",
+    "jsdoc": "^4.0.0",
     "path": "^0.12.7",
     "three": "^0.148.0",
     "ws": "^8.11.0"

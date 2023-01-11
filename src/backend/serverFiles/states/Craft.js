@@ -45,8 +45,11 @@ const recipeLocations = {
 }
 
 /*=========================== Functions ===========================*/
-
-//Get the minimum number from the list
+/**
+ * Gets the lowest number from a list
+ * @param {number[]} list list of numbers
+ * @returns the lowest number within a list
+ */
 function getMin(list) {
 	let min = list[0];
 
@@ -61,7 +64,12 @@ function getMin(list) {
 	return min;
 }
 
-//Loop through an inventory searching for a item and return the total amount of the item
+/**
+ * Loop through the inventory and search for an item name getting the total count of it within the inventory
+ * @param {string} name the item name to search for
+ * @param {Item[]} inventory the inventory to search in
+ * @returns the amount of the item being searched for within the inventory
+ */
 function getCountOfItemFromInventory(name, inventory) {
 	let sum = 0;
 
@@ -71,13 +79,18 @@ function getCountOfItemFromInventory(name, inventory) {
 		if(item != undefined && item.label == name) {
 			sum += item.count;
 		}
-
 	});
 
 	return sum;
 }
 
-//Gets the data of a item in a recipe in a more readable way
+/**
+ * Gets the data of a item within an inventory in a more readable way
+ * @param {string} key the key within the recipe
+ * @param {string} name the name of the key
+ * @param {json[]} itemMap the map of the crafting recipe of the key
+ * @returns a data of which contains a name of a item, the amount needed for a craft and the slots of which it is in
+ */
 function getKeyData(key, name, itemMap) {
 	let data = {
 		"name": name,
@@ -105,7 +118,11 @@ function getKeyData(key, name, itemMap) {
 	return data;
 }
 
-//Gets all the keyData from the recipeData
+/**
+ * Returns data in which will be used to craft an item given a recipe
+ * @param {recipeData} recipeData the data that contains the recipe
+ * @returns a list of keys that hold data about the recipe items
+ */
 function getKeyDataList(recipeData) {
 	let keyData = [];
 	let items = recipeData.items;
@@ -121,7 +138,11 @@ function getKeyDataList(recipeData) {
 	return keyData;
 }
 
-//Taking in keyData list return a list of their names
+/**
+ * Gets the names of all the items within the recipe
+ * @param {keyData} keyData a list of keys
+ * @returns all the names of the items in the recipe
+ */
 function getItemNamesAsList(keyData) {
 	let nameList = [];
 

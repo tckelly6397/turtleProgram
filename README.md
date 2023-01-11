@@ -29,16 +29,24 @@ https://pastebin.com/DGZejmGJ
 -Building blueprints
 
 ## ToDo
+### Always
+-CLEAN THE CODE - Removing unecessary functions, weird variable and function names, no returns, parameters, shared code\
+-Split up the functions into more files, make variables shared between files accessible in a better manner\
+-Lower the amount of imports used\
+-Split the code into more functions
+
 ### Basics
 -Implement exceptions\
--Error handling
+-Error handling\
+-jsdoc
 
 ### Advanced
 -Furnace usage\
 -Mining\
 -Tree farming\
 -Hive AI\
--Make it easier for this server to not be local
+-Make it easier for this server to not be local\
+-Optimize pathfinding some more\
 
 -Multi threads(So the main thread doesn't pause on execution and allow turtles to execute fatser)\
 -On WebSocket request send an id that is expected back rather than keeping a boolean to see if the turtle is busy, allows for multiple turtles to execute at once
@@ -60,3 +68,5 @@ https://docs.google.com/document/d/1a4ert9upmV6r99dBzyar_n_ZdZ_TYz9vZFOH0HqIWp4/
 ![House](./images/house-1-2.PNG)
 ![Pathfinding](./images/pathfinding-1-6.PNG)
 ![Selecting](./images/selecting-1-9.PNG)
+
+## The way to get started is to quit talking and begin doing. -Walt Disney
