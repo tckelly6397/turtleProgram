@@ -12,6 +12,7 @@ const fs = require('fs');
 
 /*=========================== Variables ===========================*/
 const turtleListPath = './src/backend/resources/TurtleData/turtleList.json';
+const selectionDir = './src/backend/resources/selections/';
 const port = 2553;
 const wss = new WebSocketServer({port});;
 let turtles = [];
@@ -46,8 +47,16 @@ function updateWin(_win) {
         //Send crafting recipes
         sendCrafting();
 
+        //Update selection list
+        sendSelectionList();
+
         initializeDone = true;
     });
+}
+
+function sendSelectionList() {
+    let files = fs.readdirSync(selectionDir);
+    win.webContents.send("backSendSelectionList", JSON.stringify(files));
 }
 
 //Send the crafting locations to the front end

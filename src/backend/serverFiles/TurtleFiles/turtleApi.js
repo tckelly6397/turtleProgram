@@ -216,8 +216,8 @@ ipcMain.on("frontState", async (event, args) => {
   } else if(state == 'craft') {
     await Craft.Craft(selectedTurtle, argument, 64);
   } else if(state == 'build') {
-    //await BuildSelection.Build(selectedTurtle, argument);
-    await BuildSelection.Build(selectedTurtle, await getInputString("Selection name", "name"));
+    await BuildSelection.Build(selectedTurtle, argument);
+    //await BuildSelection.Build(selectedTurtle, await getInputString("Selection name", "name"));
   }
 
   var endTime = performance.now();

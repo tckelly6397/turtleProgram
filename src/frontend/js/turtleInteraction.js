@@ -97,6 +97,28 @@ window.api.receive("backSendRecipeLocations", (data) => {
     }
 });
 
+window.api.receive("backSendSelectionList", (data) => {
+    let list = JSON.parse(data);
+
+    let buildList = document.getElementById("selection-list");
+
+    for(let i = 0; i < list.length; i++) {
+        let selection = list[i];
+
+        let element = document.createElement("a");
+        element.classList.add("dropdown-item");
+        element.innerText = selection
+        let keyData = {
+            "state": "build",
+            "args": `${selection}`
+        }
+        let stringData = JSON.stringify(keyData);
+        let clickCommand = "window.api.send(\"frontState\", \'" + stringData + "\');"
+        element.setAttribute("onclick", clickCommand);
+        buildList.appendChild(element);
+    }
+});
+
 /*=========================== Visual Button Controls ===========================*/
 var InteractionContainers = document.getElementsByClassName('interaction-container');
 

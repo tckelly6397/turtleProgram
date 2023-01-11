@@ -33,7 +33,7 @@ function getMeshGivenTwoCoordinates(vector1, vector2) {
     const bMat = new THREE.MeshBasicMaterial( {color: 'yellow' } );
     bMat.depthTest = false;
     bMat.transparent = true;
-    bMat.opacity = 0.7;
+    bMat.opacity = 0.5;
 
     //Create the mesh
     let mesh = new THREE.Mesh(bGeo, bMat);
@@ -217,10 +217,14 @@ function selectBlocks(event) {
     selections.push(block);
 
     //Set data on buttons
-    let selectionButtons = document.getElementById("selection-btns").children;
-    for(let i = 0; i < selectionButtons.length; i++) {
-        let btn = selectionButtons[i];
+    if(selections.length > 1) {
+        let btn = document.getElementById("save-selection-btn");
+        btn.classList.remove("low-opacity");
+        btn.setAttribute("data-canclick", "true");
+    }
 
+    if(selections.length > 0) {
+        let btn = document.getElementById("clear-selection-btn");
         btn.classList.remove("low-opacity");
         btn.setAttribute("data-canclick", "true");
     }

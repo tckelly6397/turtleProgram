@@ -27,7 +27,7 @@ contextBridge.exposeInMainWorld(
             }
         },
         receive: (channel, func) => {
-            let validChannels = ["updateTurtleData", "backSyncWorldData", "detected", "backSendTurtleList", "backSendRecipeLocations"];
+            let validChannels = ["updateTurtleData", "backSyncWorldData", "detected", "backSendTurtleList", "backSendRecipeLocations", "backSendSelectionList"];
             if (validChannels.includes(channel)) {
                 // Deliberately strip event as it includes `sender`
                 ipcRenderer.on(channel, (event, ...args) => func(...args));

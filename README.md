@@ -25,7 +25,8 @@ https://pastebin.com/DGZejmGJ
 -Inventory management\
 -Saving and Loading\
 -Visualization\
--Pathfinding
+-Pathfinding\
+-Building blueprints
 
 ## ToDo
 ### Basics
@@ -35,7 +36,6 @@ https://pastebin.com/DGZejmGJ
 
 ### Advanced
 -Furnace usage\
--Building blueprints\
 -Mining\
 -Tree farming\
 -Hive AI\
