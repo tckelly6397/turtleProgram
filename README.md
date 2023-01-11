@@ -31,14 +31,14 @@ https://pastebin.com/DGZejmGJ
 ## ToDo
 ### Basics
 -Implement exceptions\
--Error handling\
--Make blocks that turtles place have an attribtue that it was placed by a turtle
+-Error handling
 
 ### Advanced
 -Furnace usage\
 -Mining\
 -Tree farming\
 -Hive AI\
+-Make it easier for this server to not be local
 
 -Multi threads(So the main thread doesn't pause on execution and allow turtles to execute fatser)\
 -On WebSocket request send an id that is expected back rather than keeping a boolean to see if the turtle is busy, allows for multiple turtles to execute at once
@@ -47,7 +47,8 @@ https://pastebin.com/DGZejmGJ
 -Textures\
 -Rotation offset\
 -Other peripherals\
--Farming
+-Farming\
+-Turtle logins
 
 ## AI Idea
 This is crazy but heres the plan

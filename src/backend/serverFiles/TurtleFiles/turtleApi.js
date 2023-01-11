@@ -11,10 +11,12 @@ const Craft = require('../states/Craft.js');
 const Replicate = require('../states/Replicate.js');
 const Pathfind = require('../states/Pathfind.js');
 const BuildSelection = require('../states/BuildSelection.js');
+const fs = require('fs');
 
 /*=========================== Variables ===========================*/
 let win;
 let selectedTurtle;
+const selectionDir = './src/backend/resources/selections/';
 
 /*=========================== Util Functions ===========================*/
 //Call detect on the turtle and send the data to the frontend
@@ -23,7 +25,7 @@ async function detectAll(Turtle) {
   win.webContents.send("detected", jsonData);
 
   //Send to the save load manager
-  SaveLoadManager.updateLocalWorld(Turtle, jsonData);
+  SaveLoadManager.updateLocalWorld(Turtle, jsonData, false);
 }
 
 //Takes in a turtle class and a turtle json and checks if equal
@@ -216,7 +218,7 @@ ipcMain.on("frontState", async (event, args) => {
   } else if(state == 'craft') {
     await Craft.Craft(selectedTurtle, argument, 64);
   } else if(state == 'build') {
-    await BuildSelection.Build(selectedTurtle, argument);
+    await BuildSelection.Build(selectedTurtle, argument, win);
     //await BuildSelection.Build(selectedTurtle, await getInputString("Selection name", "name"));
   }
 
@@ -233,6 +235,9 @@ ipcMain.on("frontSaveSelection", async (event, args) => {
   let name = await getInputString("Name the file", "name");
 
   await SaveLoadManager.saveSelection(data, name, selectedTurtle.mapLocation);
+
+  let files = fs.readdirSync(selectionDir);
+  win.webContents.send("backSendSelectionList", JSON.stringify(files));
 });
 
 module.exports = { updateWin };

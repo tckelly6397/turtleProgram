@@ -12,6 +12,7 @@ let turtleList;
 const worldsDir = './src/backend/resources/worlds/';
 const selectionDir = './src/backend/resources/selections/';
 const turtleListPath = './src/backend/resources/TurtleData/turtleList.json';
+let win;
 
 //Maps a world name to local world data
 let LocalWorldMap = new Map();
@@ -135,7 +136,7 @@ function loadLocalWorld(turtle) {
 //Takes in a list of blocks and updates the world data with those blocks
 //If the block is air then remove the block from the world data
 //Else add it to the local world data
-function updateLocalWorld(turtle, blocks) {
+function updateLocalWorld(turtle, blocks, updateVisual) {
     let worldName = turtle.mapLocation;
     blocks = JSON.parse(blocks);
 
@@ -151,6 +152,10 @@ function updateLocalWorld(turtle, blocks) {
     }
 
     updateTurtle(turtle);
+
+    if(updateVisual) {
+        win.webContents.send("detected", JSON.stringify(blocks));
+    }
 }
 
 //Given a turtle, update turtle data
@@ -236,7 +241,9 @@ function getWorldData(worldName) {
 }
 
 //Get a block given a coordiante and a map
-function getBlock(turtle, map, x, y, z) {
+//Return -1 if a block is not found
+function getBlock(turtle, x, y, z) {
+    let map = LocalWorldMap.get(turtle.mapLocation);
     for(let i = 0; i < map.length; i++) {
         let block = map[i];
 
@@ -248,6 +255,8 @@ function getBlock(turtle, map, x, y, z) {
             return block;
         }
     }
+
+    return -1;
 }
 
 function getMinFromList(list, value) {
@@ -267,6 +276,7 @@ function isBlockInList(block, blocks) {
         let b = blocks[i];
 
         if(block.x == b.x && block.y == b.y && block.z == b.z) {
+            console.log("WORKING");
             return true;
         }
     }
@@ -276,6 +286,7 @@ function isBlockInList(block, blocks) {
 
 //Save a selection
 async function saveSelection(selections, name, mapLocation) {
+    console.log("Saving selection " + name);
     let worldData = LocalWorldMap.get(mapLocation);
     let data = {
         "blocks": [],
@@ -307,13 +318,13 @@ async function saveSelection(selections, name, mapLocation) {
                         continue;
                     }
 
-                    if(!isBlockInList(block, data.blocks)) {
-                        let blockData = {
-                            "name": block.name,
-                            "x": x + minX - absMinX,
-                            "y": y + minY - absMinY,
-                            "z": z + minZ - absMinZ
-                        }
+                    let blockData = {
+                        "name": block.name,
+                        "x": x + minX - absMinX,
+                        "y": y + minY - absMinY,
+                        "z": z + minZ - absMinZ
+                    }
+                    if(!isBlockInList(blockData, data.blocks)) {
                         data.blocks.push(blockData);
                     }
 
@@ -339,7 +350,11 @@ async function saveSelection(selections, name, mapLocation) {
     await fs.writeFileSync(selectionDir + name, JSON.stringify(data));
 }
 
-module.exports = { initialize, update, updateTurtle, updateLocalWorld, saveWorlds, saveTurtle, getWorldData, getTurtleDataByLabel, updateTurtleByData, updateTurtleList, getBlock, saveSelection, LocalWorldMap };
+function updateWin(_win) {
+    win = _win;
+}
+
+module.exports = { initialize, update, updateTurtle, updateLocalWorld, saveWorlds, saveTurtle, getWorldData, getTurtleDataByLabel, updateTurtleByData, updateTurtleList, getBlock, saveSelection, updateWin, LocalWorldMap };
 
 //Usage
 //initialize(list): read in the turtle list and apply it to the local list as well as loading in the local world map data

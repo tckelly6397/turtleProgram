@@ -182,8 +182,6 @@ body {
 
 .btn-group {
     flex-direction: column;
-
-    margin-bottom: 8px;
 }
 
 #selection-btns {

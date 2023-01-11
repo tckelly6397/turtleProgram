@@ -173,7 +173,7 @@ class Turtle {
         if(isPlaced) {
             let blocks = [];
             blocks.push(await this.detectDirection(direction, true));
-            SaveLoadManager.updateLocalWorld(this, JSON.stringify(blocks));
+            SaveLoadManager.updateLocalWorld(this, JSON.stringify(blocks), true);
             await this.updateSelectedSlot();
         }
 

@@ -14,12 +14,7 @@ async function detectAll(turtle, win) {
     let jsonData = await turtle.detect();
 
     //Send to the save load manager
-    SaveLoadManager.updateLocalWorld(turtle, jsonData);
-
-    //If win is provided then send it to the front end
-    if(win != undefined) {
-        win.webContents.send("detected", jsonData);
-    }
+    SaveLoadManager.updateLocalWorld(turtle, jsonData, true);
 
     return jsonData;
 }
@@ -83,9 +78,9 @@ async function dig(turtle, action, overrideBlockFilter, canMineTurtleBlocks, win
         let x = turtle.position.x + deltaX;
         let y = turtle.position.y + deltaY;
         let z = turtle.position.z + deltaZ;
-        let block = SaveLoadManager.getBlock(turtle, SaveLoadManager.LocalWorldMap.get(turtle.mapLocation), x, y, z);
+        let block = SaveLoadManager.getBlock(turtle, x, y, z);
 
-        if(block != undefined) {
+        if(block != -1) {
             let isTurtleBlock = block.placedByTurtle;
             if(isTurtleBlock == true) {
                 return false;
@@ -95,7 +90,7 @@ async function dig(turtle, action, overrideBlockFilter, canMineTurtleBlocks, win
 
     //If it made it past the filter then dig
     let didDig = await turtle.executeAction(digAction);
-    SaveLoadManager.updateLocalWorld(turtle, await detectAll(turtle, win));
+    SaveLoadManager.updateLocalWorld(turtle, await detectAll(turtle, win), true);
     return didDig;
 }
 

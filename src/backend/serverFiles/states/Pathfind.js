@@ -181,14 +181,23 @@ async function rotateToPositionZ(turtle, deltaZ) {
     }
 }
 
+function MoveException(message) {
+    this.message = message;
+    this.name = 'MoveException'
+}
+
 //Move the turtle and if it's allowed to mine try to dig and then move if the turtle hasn't initially moved
 async function move(turtle, action, canMine, canMinePlacedByTurtle) {
     let moved = await turtle.executeAction(action);
 
     //If it's allowed to mine and it hasn't moved then mine
     if(canMine && moved == false) {
-        SaveLoadManager.updateLocalWorld(turtle, await TurtleUtil.detectAll(turtle, win));
-        await TurtleUtil.dig(turtle, action, false, canMinePlacedByTurtle, win);
+        SaveLoadManager.updateLocalWorld(turtle, await TurtleUtil.detectAll(turtle, win), false);
+        let didDig = await TurtleUtil.dig(turtle, action, false, canMinePlacedByTurtle, win);
+        if(didDig == false) {
+            console.log("Cannot move to a block.");
+            throw new MoveException("Unable to move");
+        }
         moved = await turtle.executeAction(action);
     }
 
@@ -201,28 +210,32 @@ async function moveToNode(turtle, node, canMine, canMinePlacedByTurtle) {
     let deltaY = node.y - turtle.position.y;
     let deltaZ = node.z - turtle.position.z;
 
-    //Move on y axis if the node position is changed on the y axis
-    if(deltaY == 1) {
-        return await move(turtle, Turtle.Actions.UP, canMine, canMinePlacedByTurtle);
-    } else if(deltaY == -1) {
-        return await move(turtle, Turtle.Actions.DOWN, canMine, canMinePlacedByTurtle);
-    }
+    try {
+        //Move on y axis if the node position is changed on the y axis
+        if(deltaY == 1) {
+            return await move(turtle, Turtle.Actions.UP, canMine, canMinePlacedByTurtle);
+        } else if(deltaY == -1) {
+            return await move(turtle, Turtle.Actions.DOWN, canMine, canMinePlacedByTurtle);
+        }
 
-    //Rotate on the corresponding axis given it's change in position
-    if(deltaX == 1 || deltaX == -1) {
-        await rotateToPositionX(turtle, deltaX);
-    }
-    if(deltaZ == 1 || deltaZ == -1) {
-        await rotateToPositionZ(turtle, deltaZ);
-    }
+        //Rotate on the corresponding axis given it's change in position
+        if(deltaX == 1 || deltaX == -1) {
+            await rotateToPositionX(turtle, deltaX);
+        }
+        if(deltaZ == 1 || deltaZ == -1) {
+            await rotateToPositionZ(turtle, deltaZ);
+        }
 
-    //Must be the first node
-    if(deltaX == 0 && deltaY == 0 && deltaZ == 0) {
-        return true;
-    }
+        //Must be the first node
+        if(deltaX == 0 && deltaY == 0 && deltaZ == 0) {
+            return true;
+        }
 
-    //Move
-    return await move(turtle, Turtle.Actions.FORWARD, canMine, canMinePlacedByTurtle);
+        //Move
+        return await move(turtle, Turtle.Actions.FORWARD, canMine, canMinePlacedByTurtle);
+    } catch(e) {
+        throw e;
+    }
 }
 
 //Execute actions given a path
@@ -232,10 +245,14 @@ async function executePath(turtle, path, endX, endY, endZ, canMine, canMinePlace
     //Loop through the path
     for(let i = 0; i < path.length; i++) {
         let node = path[i];
+        let moved;
 
         //Try to move to the node
-        let moved = await moveToNode(turtle, node, canMine, canMinePlacedByTurtle);
-
+        try {
+            moved = await moveToNode(turtle, node, canMine, canMinePlacedByTurtle);
+        } catch(e) {
+            throw e;
+        }
         //If the turtle moved into a block then detect the new blocks and find a new path
         if(moved == false) {
             await TurtleUtil.detectAll(turtle, win);
@@ -276,6 +293,20 @@ async function Pathfind(turtle, endX, endY, endZ, win_, canMine, canMinePlacedBy
 
     let endNode = makeNode(endX, endY, endZ);
     endNode.gCost = beginEndDistance;
+
+    //Check if the endNode is valid
+    let block = SaveLoadManager.getBlock(turtle, endX, endY, endZ);
+    if(block != -1) {
+        if(!canMine) {
+            console.log("End position is invalid: Block in the way");
+            return false;
+        }
+
+        if(canMine && !canMinePlacedByTurtle && block.placedByTurtle == true) {
+            console.log("End position is invalid: Block placed by turtle");
+            return false;
+        }
+    }
 
     //Run the algorithm
     while(openList.length > 0) {
@@ -322,10 +353,16 @@ async function Pathfind(turtle, endX, endY, endZ, win_, canMine, canMinePlacedBy
     console.log(`finding the path took ${endTime - startTime} milliseconds`);
 
     //Make the turtle move
-    await executePath(turtle, nodePath, endX, endY, endZ, canMine, canMinePlacedByTurtle);
+    try {
+        await executePath(turtle, nodePath, endX, endY, endZ, canMine, canMinePlacedByTurtle);
+    } catch(e) {
+        //Move exception
+        return false;
+    }
 
     //Send to the save load manager
     SaveLoadManager.updateTurtle(turtle);
+    return true;
 }
 
 module.exports = { Pathfind };

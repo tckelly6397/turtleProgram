@@ -35,6 +35,7 @@ function createWindow () {
   //Set the turtleApis and server win
   turtleApi.updateWin(win);
   server.updateWin(win);
+  SaveLoadManager.updateWin(win);
 
   //On close ask to save
   win.on('close', e => {

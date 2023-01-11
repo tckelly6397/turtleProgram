@@ -49,7 +49,7 @@ async function isFurnaceInFront(turtle) {
     let x = turtle.x + Math.round(Math.cos(turtle.rotation * (Math.PI/180)));
     let y = turtle.y;
     let z = turtle.z + Math.round(Math.sin(turtle.rotation * (Math.PI/180)));
-    let block = SaveLoadManager.getBlock(turtle, map, x, y, z);
+    let block = SaveLoadManager.getBlock(turtle, x, y, z);
 
     //If a furnace is in the block in front then return
     if(block.name == "minecraft:furnace") {

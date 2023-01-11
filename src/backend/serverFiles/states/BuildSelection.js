@@ -73,7 +73,7 @@ function getLowestYFromBlocks(blocks) {
     return min;
 }
 
-async function Build(turtle, selectionName) {
+async function Build(turtle, selectionName, win) {
     let data = await fs.readFileSync(selectionDir + selectionName);
     data = JSON.parse(data);
 
@@ -88,10 +88,10 @@ async function Build(turtle, selectionName) {
         let lowestY = getLowestYFromBlocks(blocks);
         let block = getClosestBlockOnLowestY(turtle, blocks, lowestY);
 
-        await Pathfind.Pathfind(turtle, block.x, block.y + 1, block.z, undefined, true, false);
+        await Pathfind.Pathfind(turtle, block.x, block.y + 1, block.z, win, true, false);
 
         await turtle.selectItemByName(block.name);
-        await TurtleUtil.dig(turtle, Turtle.Actions.DIGDOWN, false, false, undefined);
+        await TurtleUtil.dig(turtle, Turtle.Actions.DIGDOWN, false, false, win);
         await turtle.executeAction(Turtle.Actions.PLACEDOWN);
 
         const index = blocks.indexOf(block);

@@ -101,6 +101,7 @@ window.api.receive("backSendSelectionList", (data) => {
     let list = JSON.parse(data);
 
     let buildList = document.getElementById("selection-list");
+    buildList.innerHTML = '';
 
     for(let i = 0; i < list.length; i++) {
         let selection = list[i];
