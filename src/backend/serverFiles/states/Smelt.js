@@ -168,7 +168,7 @@ async function moveToFrontOfFurnace(turtle) {
     return (backAction && downAction);
 }
 
-async function smelt(turtle, recipe, amount, fuelType) {
+async function Smelt(turtle, recipe, amount, fuelType) {
     //If the amount is -1 set it to smelt all it can
     if(amount == - 1) {
         amount == 9999999;
@@ -205,4 +205,4 @@ async function smelt(turtle, recipe, amount, fuelType) {
     //UNFINISHED BECAUSE 1.18.2 Fabric suck up on furnace does not get the output
 }
 
-module.exports = { smelt, oreFuelTypes, organicFuelTypes, allFuelTypes };
+module.exports = { Smelt, oreFuelTypes, organicFuelTypes, allFuelTypes };

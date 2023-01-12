@@ -20,6 +20,7 @@ function createWindow () {
     useContentSize: true,
     width: 1000,
     height: 700,
+    icon: './icons/icon.ico',
 
     // The lines below solved the issue
     webPreferences: {
@@ -27,7 +28,7 @@ function createWindow () {
       contextIsolation: true,
       enableRemoteModule: false,
       preload: path.join(__dirname, 'preload.js')
-    },
+    }
   })
 
   win.loadFile(indexPath);

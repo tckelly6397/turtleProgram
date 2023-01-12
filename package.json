@@ -22,7 +22,7 @@
   },
   "homepage": "https://github.com/tckelly6397/turtleProgram#readme",
   "dependencies": {
-    "electron": "^22.0.0",
+    "electron": "^22.0.1",
     "electron-prompt": "^1.7.0",
     "electron-reload": "^2.0.0-alpha.1",
     "heap-js": "^2.2.0",
@@ -34,6 +34,9 @@
   "build": {
     "extraResources": [
       "./src/**"
+    ],
+    "files": [
+      "build/*"
     ]
   }
 }

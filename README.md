@@ -46,7 +46,7 @@ https://pastebin.com/DGZejmGJ
 -Tree farming\
 -Hive AI\
 -Make it easier for this server to not be local\
--Optimize pathfinding some more\
+-Optimize pathfinding some more
 
 -Multi threads(So the main thread doesn't pause on execution and allow turtles to execute fatser)\
 -On WebSocket request send an id that is expected back rather than keeping a boolean to see if the turtle is busy, allows for multiple turtles to execute at once

@@ -4,14 +4,8 @@ const { ipcMain } = require('electron');
 const SaveLoadManager = require('./SaveLoadManager');
 const Turtle = require('./Turtle.js');
 const prompt = require('electron-prompt');
-const Suck = require('../states/Suck.js');
-const Drop = require('../states/Drop.js');
-const TransferItems = require('../states/TransferItems.js');
-const Craft = require('../states/Craft.js');
-const Replicate = require('../states/Replicate.js');
-const Pathfind = require('../states/Pathfind.js');
-const BuildSelection = require('../states/BuildSelection.js');
 const fs = require('fs');
+const StateHandler = require('./StateHandler.js');
 
 /*=========================== Variables ===========================*/
 let win;
@@ -54,37 +48,6 @@ function updateWin(_win) {
   win = _win;
 }
 
-//If called then ask user for type of block to place, it will look for the block and select it
-//then place it update update the data
-async function placeAction(action) {
-  prompt({
-    title: 'Place block',
-    label: 'Name',
-    value: '',
-    inputAttrs: {
-        type: 'name'
-    },
-    type: 'input'
-  })
-  .then(async (r) => {
-    if(r === null) {
-        console.log('user cancelled');
-    } else {
-        console.log('result', r);
-        let flag = await selectedTurtle.selectItemByName(r);
-
-        if(flag) {
-          await selectedTurtle.executeAction(action);
-
-          await updateData();
-        } else {
-          console.log("Block not found.");
-        }
-    }
-  })
-  .catch(console.error);
-}
-
 async function askPathfind(x, y, z, canMine) {
   prompt({
     title: 'Place block',
@@ -100,7 +63,7 @@ async function askPathfind(x, y, z, canMine) {
         console.log('user cancelled');
     } else {
         let data = JSON.parse(r);
-        await Pathfind.Pathfind(selectedTurtle, data.x, data.y, data.z, win, data.canMine, false);
+        await StateHandler.Pathfind(selectedTurtle, data.x, data.y, data.z, win, data.canMine, false);
     }
   })
   .catch(console.error);
@@ -144,12 +107,9 @@ async function updateData() {
 ipcMain.on("frontAction", async (event, args) => {
   let data = JSON.parse(args);
 
-  //If it's a place action and the argument is true then ask for block name
-  if(data.args == 'true' && (data.action == "placeForward" || data.action == "placeUp" || data.action == "placeDown")) {
-    placeAction(data.action);
-  } else {
-    await selectedTurtle.executeAction(data.action, data.args);
-  }
+  //Execute the action
+  await selectedTurtle.executeAction(data.action, data.args);
+
   //When you move update the turtle position send to front end the new data
   selectedTurtle.fuel = await selectedTurtle.executeAction(Turtle.Actions.GETFUEL);
   await updateData();
@@ -200,26 +160,25 @@ ipcMain.on("frontState", async (event, args) => {
   var startTime = performance.now()
 
   if(state == 'suck') {
-    await Suck.SuckAll(selectedTurtle, argument);
+    await StateHandler.SuckAll(selectedTurtle, argument);
   } else if(state == 'drop') {
     //await Drop.DropAllFilter(selectedTurtle, argument, ["minecraft:dirt", "minecraft:stone"]); //["minecraft:dirt"]
-    await Drop.DropAll(selectedTurtle, argument);
+    await StateHandler.DropAll(selectedTurtle, argument);
     //await Drop.DropSlots(selectedTurtle, argument, Drop.DefinedSlots.SideSlots);
   } else if(state == 'transfer') {
-    await TransferItems.TransferItems(selectedTurtle, TransferItems.DefinedSlots.SideSlots);
+    await StateHandler.TransferItems(selectedTurtle, TransferItems.DefinedSlots.SideSlots);
   } else if(state == 'replicate') {
-    await Replicate.Replicate(selectedTurtle);
+    await StateHandler.Replicate(selectedTurtle);
   } else if(state == 'pathfind') {
     //Don't mine
     //Move to specified path
-    await Pathfind.Pathfind(selectedTurtle, 1, 0, -9, win, false, false);
+    await StateHandler.Pathfind(selectedTurtle, 1, 0, -9, win, false, false);
   } else if(state == 'pathfindClick') {
     await askPathfind(argument.x, argument.y, argument.z, argument.canMine);
   } else if(state == 'craft') {
-    await Craft.Craft(selectedTurtle, argument, 64);
+    await StateHandler.Craft(selectedTurtle, argument, 64);
   } else if(state == 'build') {
-    await BuildSelection.Build(selectedTurtle, argument, win);
-    //await BuildSelection.Build(selectedTurtle, await getInputString("Selection name", "name"));
+    await StateHandler.Build(selectedTurtle, argument, win);
   }
 
   var endTime = performance.now();
