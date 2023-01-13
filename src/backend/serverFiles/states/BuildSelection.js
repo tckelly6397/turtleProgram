@@ -121,6 +121,12 @@ async function Build(turtle, selectionName, win) {
 
     let blocks = data.blocks;
     let blockCount = data.blockCount;
+    let hasEnough = TurtleUtil.checkInventoryForItems(turtle, blockCount);
+
+    if(!hasEnough) {
+        console.log("Not enough blocks.");
+        return false;
+    }
 
     //Make all the blocks relative to the turtle
     addCoordsToBlocks(turtle, blocks);

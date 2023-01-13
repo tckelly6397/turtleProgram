@@ -94,4 +94,43 @@ async function dig(turtle, action, overrideBlockFilter, canMineTurtleBlocks, win
     return didDig;
 }
 
-module.exports = { excludeBlockFilter, detectAll, dig };
+function checkInventoryForItems(turtle, blockCount) {
+    let inventoryData = {};
+
+    let inventory = turtle.inventory;
+    for(let i = 0; i < inventory.length; i++) {
+        let itemSlot = inventory[i];
+
+        if(itemSlot == undefined) {
+            continue;
+        }
+
+        if(inventoryData[itemSlot.label] == undefined) {
+            inventoryData[itemSlot.label] = 0;
+        }
+        inventoryData[itemSlot.label] += itemSlot.count;
+    }
+
+    console.log(blockCount);
+    console.log(inventoryData);
+
+    for(let item in blockCount) {
+        console.log(item);
+        let inItem = inventoryData[item];
+        console.log(inItem);
+
+        if(inItem == undefined) {
+            console.log("No " + item + " in inventory.");
+            return false;
+        }
+
+        if(inItem < blockCount[item]) {
+            console.log("Not enough: " + item + ". Currently have " + inItem + " and need " + blockCount[item]);
+            return false;
+        }
+    }
+
+    return false;
+}
+
+module.exports = { excludeBlockFilter, detectAll, dig, checkInventoryForItems };

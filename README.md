@@ -17,6 +17,9 @@ Paste this as startup\
 pastebin get DGZejmGJ startup\
 https://pastebin.com/DGZejmGJ
 
+## Problems
+As far as I know in the Fabric Version 1.100.8 interaction with the outputs of furnaces are not working with turtles so as of recent I am now developing on Forge 1.19.2
+
 ## Features
 -Crafting\
 -Replication\
@@ -57,7 +60,8 @@ https://pastebin.com/DGZejmGJ
 -Rotation offset\
 -Other peripherals\
 -Farming\
--Turtle logins
+-Turtle logins\
+-Redstone interaction
 
 ## AI Idea
 This is crazy but heres the plan
