@@ -38,7 +38,8 @@ https://pastebin.com/DGZejmGJ
 ### Basics
 -Implement exceptions\
 -Error handling\
--jsdoc
+-jsdoc\
+-Go over Pathfinding, problem in there with blockPlacedByTurtle I believe
 
 ### Advanced
 -Furnace usage\

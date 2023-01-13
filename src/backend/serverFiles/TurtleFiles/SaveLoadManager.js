@@ -247,9 +247,9 @@ function getBlock(turtle, x, y, z) {
     for(let i = 0; i < map.length; i++) {
         let block = map[i];
 
-        let checkX = x + Math.round(Math.cos(turtle.rotation * (Math.PI/180)));
+        let checkX = x; //+ Math.round(Math.cos(turtle.rotation * (Math.PI/180)));
         let checkY = y;
-        let checkZ = z + Math.round(Math.sin(turtle.rotation * (Math.PI/180)));
+        let checkZ = z; //+ Math.round(Math.sin(turtle.rotation * (Math.PI/180)));
 
         if(block.x == checkX && block.y == checkY && block.z == checkZ) {
             return block;

@@ -8,6 +8,16 @@ const TurtleUtil = require("../TurtleFiles/TurtleUtil.js");
 let win;
 
 /*=========================== Functions ===========================*/
+function MoveException(message) {
+    this.message = message;
+    this.name = 'MoveException'
+}
+
+function BlockException(message) {
+    this.message = message;
+    this.name = 'MoveException'
+}
+
 //Gets the distance between xyz coordinates
 function distancePos(x1, y1, z1, x2, y2, z2) {
     let deltaX = x2 - x1;
@@ -181,16 +191,6 @@ async function rotateToPositionZ(turtle, deltaZ) {
     }
 }
 
-function MoveException(message) {
-    this.message = message;
-    this.name = 'MoveException'
-}
-
-function BlockException(message) {
-    this.message = message;
-    this.name = 'MoveException'
-}
-
 //Move the turtle and if it's allowed to mine try to dig and then move if the turtle hasn't initially moved
 async function move(turtle, action, canMine, canMinePlacedByTurtle) {
     let moved = await turtle.executeAction(action);
@@ -293,6 +293,7 @@ async function Pathfind(turtle, endX, endY, endZ, win_, canMine, canMinePlacedBy
 
     //Check if the endNode is valid
     let block = SaveLoadManager.getBlock(turtle, endX, endY, endZ);
+    console.log(block + " " + canMine + " " + block.placedByTurtle + " " + canMinePlacedByTurtle);
     if(block != -1) {
         if(!canMine) {
             throw new BlockException("Cannot mine.");
